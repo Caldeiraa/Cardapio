@@ -1,0 +1,4 @@
+Criar um sistema de lanchonete
+onde é possivel q o cliente da lanchonnete veja o cardapio somente
+o garçon consiga fazer o pedido de forma simples e facil
+e a cozinha consiga ve o que foi pedido 
