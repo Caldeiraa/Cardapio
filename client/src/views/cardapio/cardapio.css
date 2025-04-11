@@ -1,0 +1,16 @@
+.container {
+    margin-top: 5%;
+  }
+  
+  .titulo {
+    margin-top: 3%;
+    text-align: center;
+  }
+  
+  .img-um, .img-dois, .img-tres {
+    width: 230px;
+    height: 120px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  
