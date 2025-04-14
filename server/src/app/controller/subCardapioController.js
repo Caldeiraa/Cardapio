@@ -1,0 +1,41 @@
+const SubCardapio = require("../models/SubCardapio")
+
+class SubCategoriaController{
+
+    index(req,res){
+        let {id_cardapio} = req.params
+        SubCardapio.mostrarTodos(id_cardapio).then(resposta=>{
+            
+            res.status(resposta[0]).json(resposta[1])
+        }).catch(
+            resposta =>{
+                res.status(resposta[0]).json("Erro: "+resposta[1].errno)
+            }
+        )
+    }
+    /*show(req,res){
+        let {id_prod} = req.params
+        let {id_mercado} = req.body
+        FeedMercado.mostrarUm(id_prod,id_mercado).then(resposta=>{
+            res.status(resposta[0]).json(resposta[1])
+        }).catch(
+            resposta =>{
+                res.status(resposta[0]).json("Erro: "+resposta[1].errno)
+            }
+        )
+    }
+
+    showSubCategorias(req,res){
+        let {id_subCategoria} = req.params
+
+        FeedMercado.mostrarSubCategoria(id_subCategoria).then(resposta=>{
+            res.status(resposta[0]).json(resposta[1])
+        }).catch(
+            resposta =>{
+                res.status(resposta[0]).json("Erro: "+resposta[1].errno)
+            }
+        )
+    }*/
+}
+
+module.exports = new SubCategoria()
