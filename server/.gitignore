@@ -1,0 +1,15 @@
+# node_modules (pasta de dependências)
+node_modules/
+
+# Arquivos de log
+*.log
+npm-debug.log*
+
+# Arquivos de ambiente
+.env
+
+# Cache de editores
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
