@@ -6,36 +6,35 @@ import Combo from '../../img/combo.png'
 import './cardapio.css'
 
 function Index() {
+
+  
+
   return (
-    <div>
-      <div className="titulo">
+    <div className="container mt-4">
+      <div className="text-center mb-4">
         <h1>Cardápio - Botique</h1>
       </div>
 
-      <div className="container">
-        <div className="row">
-          <div className="col-6 d-flex justify-content-center mb-4">
-            <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-              <img className="img-um" src={Lanche} alt="Lanche" />
-            </a>
-          </div>
-          <div className="col-6 d-flex justify-content-center mb-4">
-            <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-              <img className="img-dois" src={Espetinho} alt="Espetinho" />
-            </a>
-          </div>
+      <div className="row">
+        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
+          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
+            <img className="img-cardapio" src={Lanche} alt="Lanche" />
+          </a>
         </div>
-        <div className="row">
-          <div className="col-6 d-flex justify-content-center mb-4">
-            <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-              <img className="img-tres" src={Sorvete} alt="Sorvete" />
-            </a>
-          </div>
-          <div className="col-6 d-flex justify-content-center mb-4">
-            <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-              <img className="img-tres" src={Combo} alt="Combo" />
-            </a>
-          </div>
+        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
+          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
+            <img className="img-cardapio" src={Espetinho} alt="Espetinho" />
+          </a>
+        </div>
+        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
+          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
+            <img className="img-cardapio" src={Sorvete} alt="Sorvete" />
+          </a>
+        </div>
+        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
+          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
+            <img className="img-cardapio" src={Combo} alt="Combo" />
+          </a>
         </div>
       </div>
     </div>

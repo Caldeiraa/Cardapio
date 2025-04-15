@@ -1,16 +1,20 @@
-.container {
-    margin-top: 5%;
+.img-cardapio {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.img-cardapio:hover {
+  transform: scale(1.05);
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 2.5rem
   }
-  
-  .titulo {
-    margin-top: 3%;
-    text-align: center;
-  }
-  
-  .img-um, .img-dois, .img-tres {
-    width: 230px;
-    height: 120px;
-    border-radius: 10px;
-    object-fit: cover;
-  }
-  
+}
