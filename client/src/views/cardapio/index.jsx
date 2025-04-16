@@ -1,13 +1,18 @@
-import React from 'react'
-import Lanche from '../../img/hamburguer.png'
-import Espetinho from '../../img/espetinho.png'
-import Sorvete from '../../img/sorvete.png'
-import Combo from '../../img/combo.png'
-import './cardapio.css'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Lanche from '../../img/hamburguer.png';
+import Espetinho from '../../img/espetinho.png';
+import Sorvete from '../../img/sorvete.png';
+import Combo from '../../img/combo.png';
+import './cardapio.css';
 
-function Index() {
-
-  
+function Cardapio() {
+  const categorias = [
+    { id: 1, imagem: Lanche, nome: 'Lanche' },
+    { id: 2, imagem: Espetinho, nome: 'Espetinho' },
+    { id: 3, imagem: Sorvete, nome: 'Sorvete' },
+    { id: 4, imagem: Combo, nome: 'Combo' },
+  ];
 
   return (
     <div className="container mt-4">
@@ -16,29 +21,16 @@ function Index() {
       </div>
 
       <div className="row">
-        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
-          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-            <img className="img-cardapio" src={Lanche} alt="Lanche" />
-          </a>
-        </div>
-        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
-          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-            <img className="img-cardapio" src={Espetinho} alt="Espetinho" />
-          </a>
-        </div>
-        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
-          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-            <img className="img-cardapio" src={Sorvete} alt="Sorvete" />
-          </a>
-        </div>
-        <div className="col-12 col-sm-6 d-flex justify-content-center mb-4">
-          <a href="/sub_categoria" target="_blank" rel="noopener noreferrer">
-            <img className="img-cardapio" src={Combo} alt="Combo" />
-          </a>
-        </div>
+        {categorias.map((categoria) => (
+          <div key={categoria.id} className="col-12 col-sm-6 d-flex justify-content-center mb-4">
+            <Link to={`/sub_categoria/${categoria.id}`} className="text-decoration-none">
+              <img className="img-cardapio" src={categoria.imagem} alt={categoria.nome} />
+            </Link>
+          </div>
+        ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default Index
+export default Cardapio;

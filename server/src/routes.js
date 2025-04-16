@@ -1,14 +1,12 @@
-const express = require("express")
-const router = express.Router
+const express = require('express');
+const routes = express.Router();
 
-const routes = new router()
+const SubCardapio = require('../src/app/controller/subCardapioController');
 
-const SubCardapio = require("./app/controllers/subCardapioController")
+routes.get('/getCadastroUs', (req, res) => {
+  res.sendFile('usuario2.html', { root: './public' });
+});
 
-routes.get("/getCadastroUs",(req,res)=>{
-    res.sendFile("usuario2.html",{root:'./public'})
-})
+routes.get('/subCategoria/:id_cardapio', SubCardapio.index);
 
-routes.get("/subCategoria/:id_cardapio",SubCardapio.show)
-
-module.exports = routes
+module.exports = routes;
