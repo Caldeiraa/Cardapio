@@ -1,0 +1,16 @@
+.subcardapio-container {
+    padding: 20px;
+  }
+  
+  .produtos-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .produto-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 200px;
+  }
+  

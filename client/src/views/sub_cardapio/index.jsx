@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import './subCardapio.css';
 
 function SubCardapio() {
   const { id_cardapio } = useParams();
@@ -12,8 +11,10 @@ function SubCardapio() {
     async function carregarSubCardapio() {
       try {
         const resposta = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
-        const respostaClone = resposta.clone(); // Cria uma cópia do fluxo da resposta
-        const dados = await respostaClone.json(); // Lê o corpo da resposta
+          if (!resposta.ok) {
+          throw new Error(`Erro na requisição: ${resposta.status}`);
+        }
+        const dados = await resposta.json();
         setProdutos(dados);
       } catch (error) {
         setErro(error.message);
@@ -26,32 +27,32 @@ function SubCardapio() {
   }, [id_cardapio]);
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <div className="text-center mt-5">Carregando...</div>;
   }
 
   if (erro) {
-    return <div>Erro: {erro}</div>;
+    return <div className="text-danger text-center mt-5">Erro: {erro}</div>;
   }
 
   return (
-    <div className="subcardapio-container">
-      <h1>Subcardápio</h1>
-      <div className="produtos-lista">
-        {produtos.map((produto, index) => {
-          const chaveUnica = produto.id_produto || `produto-${index}`;
-          return (
-            <div key={chaveUnica} className="produto-card">
-              <img
-                src={`http://localhost:3000/img/${produto.foto_produto}`}
-                alt={produto.nome_produto}
-                className="produto-imagem"
-              />
-              <h2>{produto.nome_produto}</h2>
-              <p><strong>Descrição:</strong> {produto.descricao_produto}</p>
-              <p><strong>Preço:</strong> R$ {produto.preco_produto}</p>
+    <div className="container my-5">
+      <h1 className="text-center mb-4">Subcardápio</h1>
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {produtos.map((produto, index) => (
+          <div className="col" key={index}>
+            <div className="card h-100 shadow-sm">
+              <div className="card-body">
+                <h5 className="card-title">{produto.nome}</h5>
+                <p className="card-text">
+                  <strong>Descrição:</strong> {produto.descricao_prod}
+                </p>
+                <p className="card-text">
+                  <strong>Preço:</strong> R$ {parseFloat(produto.preco).toFixed(2)}
+                </p>
+              </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );

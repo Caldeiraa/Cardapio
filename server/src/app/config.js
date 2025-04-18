@@ -3,7 +3,7 @@ const config = {
         host:"localhost",
         user:"root",
         password:"murilo123",
-        database:"lanchonete"
+        database:"lanchonetes"
     }
 }
 module.exports = config

@@ -24,10 +24,10 @@ class App {
     }));
   }
 
-  routes() {
+  /*routes() {
     this.server.use("/public/img", express.static("public/img"));
     this.server.use(routes);
-  }
+  }*/
 }
 
 module.exports = new App().server;
