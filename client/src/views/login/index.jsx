@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Importando o hook useNavigate
+import { jwtDecode } from 'jwt-decode';
 
 function Login() {
   const [nomeUsuario, setNomeUsuario] = useState('');
   const [senha, setSenha] = useState('');
+  const navigate = useNavigate(); // Inicializando o navigate
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -14,9 +17,22 @@ function Login() {
         senha: senha
       });
 
-      // Aqui você pode salvar o token ou redirecionar o usuário
-      console.log('Login realizado com sucesso:', response.data);
-      window.location.href = "/"
+      // Armazenando o token no localStorage
+      localStorage.setItem('token', response.data.token);
+
+      // Decodificando o token para obter o usuario_tipo
+      const decodedToken = jwtDecode(response.data.token);
+      const usuarioTipo = decodedToken.usuario_tipo;
+
+      // Verificando o tipo de usuário e redirecionando para a página correspondente
+      if (usuarioTipo === 'g') {
+        navigate("/garcom/cardapio");
+      } else if (usuarioTipo === 'c') {
+        navigate("/cozinha");
+      } else {
+        alert("Tipo de usuário desconhecido.");
+      }
+
     } catch (error) {
       console.error('Erro ao fazer login:', error.response?.data || error.message);
       alert('Usuário ou senha inválidos.');

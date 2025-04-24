@@ -24,7 +24,7 @@ function Index() {
     try {
       const response = await axios.post('http://localhost:3000/usuarioC', formData);
       setMensagem('Funcionário cadastrado com sucesso!');
-      window.location.href = "/fun"
+      window.location.href = "/login"
     } catch (error) {
       setMensagem('Erro ao cadastrar funcionário.');
     }
