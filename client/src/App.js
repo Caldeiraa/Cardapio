@@ -18,7 +18,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Cardapio />} />
-        <Route path="/garcom/cadardapio" element={<CardapioG />} />
+        <Route path="/garcom/cardapio" element={<CardapioG />} />
         <Route path="/sub_categoria/:id_cardapio" element={<SubCardapio />} />
         <Route path="/cozinha" element={<Cozinha />} />
         <Route path="/garcom/sub_categoria/:id_cardapio" element={<SubCardapioGarcom />} />

@@ -1,126 +1,116 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import CarrinhoFlutuante from '../../components/carrinhoFlutuate';
 
 function SubCardapioGarcom() {
   const { id_cardapio } = useParams();
+  const navigate = useNavigate();
   const [produtos, setProdutos] = useState([]);
-  const [quantidades, setQuantidades] = useState({});
-  const [nomeCliente, setNomeCliente] = useState('');
-  const [mesa, setMesa] = useState('');
+  const [pedido, setPedido] = useState({ nome_cliente: '', mesa: '', total: 0, itens: [] });
 
   useEffect(() => {
-
     const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
+    try { jwtDecode(token); } catch { return navigate("/login"); }
 
-    if (!token) {
-      alert("Efetue login");
-      window.location.href = "/login";
-    } else {
-      try {
-        const decodedToken = jwtDecode(token);
-        const usuario_id = decodedToken.usuario_id;
-        console.log("Usuario ID:", usuario_id);
-      } catch (error) {
-        console.error("Erro ao decodificar token:", error);
-        alert("Erro ao decodificar token");
-        window.location.href = "/login";
-      }
-    }
-    
     async function fetchProdutos() {
-      const resposta = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
-      const dados = await resposta.json();
-      setProdutos(dados);
-      const inicial = {};
-      dados.forEach((item) => {
-        inicial[item.id_sup_cardapio] = 0;
-      });
-      setQuantidades(inicial);
+      const res = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
+      const data = await res.json();
+      setProdutos(data);
     }
+
+    const pedidoSalvo = JSON.parse(localStorage.getItem("pedido_em_progresso"));
+    if (pedidoSalvo) setPedido(pedidoSalvo);
 
     fetchProdutos();
   }, [id_cardapio]);
 
   const alterarQuantidade = (id, delta) => {
-    setQuantidades((prev) => ({
-      ...prev,
-      [id]: Math.max(0, (prev[id] || 0) + delta),
-    }));
-  };
+    const produto = produtos.find(p => p.id_sup_cardapio === id);
+    if (!produto) return;
 
-  const calcularTotal = () => {
-    return produtos.reduce((total, produto) => {
-      const qtd = quantidades[produto.id_sup_cardapio] || 0;
-      return total + qtd * parseFloat(produto.preco);
-    }, 0).toFixed(2);
+    const novaLista = [...pedido.itens];
+    const index = novaLista.findIndex(item => item.sub_cardapio_id === id);
+    
+    if (index >= 0) {
+      novaLista[index].quantidade += delta;
+      if (novaLista[index].quantidade <= 0) novaLista.splice(index, 1);
+    } else if (delta > 0) {
+      novaLista.push({
+        sub_cardapio_id: produto.id_sup_cardapio,
+        nome: produto.nome,
+        quantidade: 1,
+        preco: parseFloat(produto.preco)
+      });
+    }
+
+    const novoTotal = novaLista.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+    const novoPedido = { ...pedido, itens: novaLista, total: novoTotal };
+    setPedido(novoPedido);
+    localStorage.setItem("pedido_em_progresso", JSON.stringify(novoPedido));
   };
 
   const enviarPedido = async () => {
-    const itensSelecionados = produtos
-      .filter((p) => quantidades[p.id_sup_cardapio] > 0)
-      .map((p) => ({
-        sub_cardapio_id: p.id_sup_cardapio,
-        quantidade: quantidades[p.id_sup_cardapio],
-        preco: p.preco,
-      }));
+    if (!pedido.nome_cliente || !pedido.mesa || pedido.itens.length === 0) {
+      alert("Complete os dados do pedido!");
+      return;
+    }
 
-    const pedido = {
-      nome_cliente: nomeCliente,
-      mesa,
-      total: calcularTotal(),
-      itens: itensSelecionados,
-    };
-
-    const resposta = await fetch("http://localhost:3000/pedido", {
+    const res = await fetch("http://localhost:3000/pedido", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(pedido)
     });
 
-    const resultado = await resposta.json();
-    if (resposta.ok) {
+    if (res.ok) {
       alert("Pedido enviado!");
-      setQuantidades({});
+      setPedido({ nome_cliente: '', mesa: '', total: 0, itens: [] });
+      localStorage.removeItem("pedido_em_progresso");
+      navigate("/garcom/cardapio");
     } else {
-      alert("Erro ao enviar pedido: " + resultado);
+      alert("Erro ao enviar pedido");
     }
   };
 
   return (
-    <div className="container my-5">
-      <h1 className="text-center mb-4">Pedido do Garçom</h1>
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <input className="form-control" placeholder="Nome do Cliente" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} />
+    <>
+      <div className="container mt-3 mb-5 pb-5">
+        <h4 className="text-center">Pedido do Garçom</h4>
+        <div className="row mb-2">
+          <div className="col-6">
+            <input className="form-control" placeholder="Cliente" value={pedido.nome_cliente} onChange={(e) => setPedido({ ...pedido, nome_cliente: e.target.value })} />
+          </div>
+          <div className="col-6">
+            <input className="form-control" placeholder="Mesa" value={pedido.mesa} onChange={(e) => setPedido({ ...pedido, mesa: e.target.value })} />
+          </div>
         </div>
-        <div className="col-md-6">
-          <input className="form-control" placeholder="Mesa" value={mesa} onChange={(e) => setMesa(e.target.value)} />
-        </div>
-      </div>
-      <div className="row row-cols-1 row-cols-md-3 g-4">
-        {produtos.map((produto) => (
-          <div className="col" key={produto.id_sup_cardapio}>
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title">{produto.nome}</h5>
-                <p>{produto.descricao_prod}</p>
-                <p><strong>R$ {parseFloat(produto.preco).toFixed(2)}</strong></p>
-                <div className="d-flex align-items-center gap-2">
-                  <button className="btn btn-outline-danger btn-sm" onClick={() => alterarQuantidade(produto.id_sup_cardapio, -1)}>-</button>
-                  <span>{quantidades[produto.id_sup_cardapio] || 0}</span>
-                  <button className="btn btn-outline-success btn-sm" onClick={() => alterarQuantidade(produto.id_sup_cardapio, 1)}>+</button>
+
+        <div className="row g-2">
+          {produtos.map((p) => {
+            const qtd = pedido.itens.find(item => item.sub_cardapio_id === p.id_sup_cardapio)?.quantidade || 0;
+            return (
+              <div className="col-6" key={p.id_sup_cardapio}>
+                <div className="card h-100">
+                  <div className="card-body p-2">
+                    <h6>{p.nome}</h6>
+                    <p style={{ fontSize: '12px' }}>{p.descricao_prod}</p>
+                    <p><strong>R$ {parseFloat(p.preco).toFixed(2)}</strong></p>
+                    <div className="d-flex align-items-center gap-2">
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => alterarQuantidade(p.id_sup_cardapio, -1)}>-</button>
+                      <span>{qtd}</span>
+                      <button className="btn btn-sm btn-outline-success" onClick={() => alterarQuantidade(p.id_sup_cardapio, 1)}>+</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
+            );
+          })}
+        </div>
       </div>
-      <div className="mt-4 d-flex justify-content-between">
-        <h4>Total: R$ {calcularTotal()}</h4>
-        <button className="btn btn-primary" onClick={enviarPedido} disabled={!nomeCliente || !mesa}>Enviar Pedido</button>
-      </div>
-    </div>
+
+      <CarrinhoFlutuante pedido={pedido} alterarQuantidade={alterarQuantidade} enviarPedido={enviarPedido} />
+    </>
   );
 }
 

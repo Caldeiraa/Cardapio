@@ -1,17 +1,17 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Para usar o hook useNavigate
+import { useNavigate } from 'react-router-dom';
 
 function Navbar() {
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const handleBack = () => {
-    navigate(-1); // Volta para a página anterior
+    navigate(-1);
   };
 
   const handleLogout = () => {
-    // Aqui você pode implementar a lógica de logout (limpar token, etc.)
-    localStorage.removeItem('token'); // Exemplo de remoção do token
-    navigate("/login"); // Redireciona para a página de login
+    localStorage.removeItem('token');
+    navigate("/login");
   };
 
   return (
@@ -19,7 +19,9 @@ function Navbar() {
       <nav className="navbar navbar-light bg-light">
         <div className="container-fluid">
           <button className="btn btn-secondary" onClick={handleBack}>Voltar</button>
-          <button className="btn btn-danger ms-2" onClick={handleLogout}>Logoff</button>
+          {token && (
+            <button className="btn btn-danger ms-2" onClick={handleLogout}>Logoff</button>
+          )}
         </div>
       </nav>
     </div>
