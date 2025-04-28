@@ -1,7 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode'; // Corrigido o nome da função
+import { useNavigate } from 'react-router-dom';
 
 function Index() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.usuario_tipo !== "a") {
+        navigate("/login"); // Se não for da cozinha, redireciona para login
+        return;
+      }
+    } catch (error) {
+      navigate("/login");
+      return;
+    }
+  }, [navigate]); // Passando `navigate` como dependência para o `useEffect`
+
   const [formData, setFormData] = useState({
     nome_usuario: '',
     tipo_usuario: 'g',
@@ -24,7 +47,10 @@ function Index() {
     try {
       const response = await axios.post('http://localhost:3000/usuarioC', formData);
       setMensagem('Funcionário cadastrado com sucesso!');
-      window.location.href = "/login"
+      // Redireciona para o login após o cadastro
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000); // Tempo para mostrar a mensagem antes de redirecionar
     } catch (error) {
       setMensagem('Erro ao cadastrar funcionário.');
     }

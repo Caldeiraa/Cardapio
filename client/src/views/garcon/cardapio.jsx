@@ -6,6 +6,7 @@ import Combo from '../../img/combo.png';
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect } from 'react';
 import './cardapioG.css';
+import { useNavigate } from 'react-router-dom';
 
 function Cardapio() {
   const categorias = [
@@ -14,20 +15,24 @@ function Cardapio() {
     { id: 3, imagem: Sorvete, nome: 'Sorvete' },
     { id: 4, imagem: Combo, nome: 'Combo' },
   ];
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
-      alert("Efetue login");
-      window.location.href = "/login";
-    } else {
-      try {
-        jwtDecode(token); // Validação simples
-      } catch (error) {
-        alert("Erro ao decodificar token");
-        window.location.href = "/login";
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.usuario_tipo !== "g" && decoded.usuario_tipo !== "a") {
+        navigate("/login"); // Se não for "c" nem "a", redireciona
+        return;
       }
+    } catch (error) {
+      navigate("/login");
+      return;
     }
   }, []);
 

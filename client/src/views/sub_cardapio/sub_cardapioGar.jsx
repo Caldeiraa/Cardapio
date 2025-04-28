@@ -10,9 +10,22 @@ function SubCardapioGarcom() {
   const [pedido, setPedido] = useState({ nome_cliente: '', mesa: '', total: 0, itens: [] });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return navigate("/login");
-    try { jwtDecode(token); } catch { return navigate("/login"); }
+   const token = localStorage.getItem("token");
+       if (!token) {
+         navigate("/login");
+         return;
+       }
+   
+       try {
+         const decoded = jwtDecode(token);
+         if (decoded.usuario_tipo !== "g" && decoded.usuario_tipo !== "a") {
+           navigate("/login"); // Se não for "c" nem "a", redireciona
+           return;
+         }
+       } catch (error) {
+         navigate("/login");
+         return;
+       }
 
     async function fetchProdutos() {
       const res = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);

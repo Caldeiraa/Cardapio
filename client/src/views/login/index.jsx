@@ -29,6 +29,8 @@ function Login() {
         navigate("/garcom/cardapio");
       } else if (usuarioTipo === 'c') {
         navigate("/cozinha");
+      } else if (usuarioTipo === 'a') {
+        navigate("/cadastroU");
       } else {
         alert("Tipo de usuário desconhecido.");
       }

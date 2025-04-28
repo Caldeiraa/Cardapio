@@ -7,9 +7,9 @@ import SubCardapio from './views/sub_cardapio/index'; // Cliente
 import SubCardapioGarcom from './views/sub_cardapio/sub_cardapioGar'; // Garçom
 import Login from './views/login/index';
 import CadastroU from './views/cadastroUsuarios/index';
-import Pedidos from './views/pedidos/index';
 import CardapioG from './views/garcon/cardapio'
 import Cozinha from './views/cozinha/index'
+import CadastroItens from './views/cadastroItens/index'
 import './App.css';
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
         <Route path="/garcom/sub_categoria/:id_cardapio" element={<SubCardapioGarcom />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastroU" element={<CadastroU />} />
-        <Route path="/pedidos" element={<Pedidos />} />
+        <Route path="/cadastroI" element={<CadastroItens />} />
       </Routes>
     </BrowserRouter>
   );
