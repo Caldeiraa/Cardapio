@@ -5,7 +5,7 @@ function Index() {
   const [formData, setFormData] = useState({
     nome: '',
     preco: '',
-    imagem: '',
+    imagem: null,
     descricao_prod: '',
     cardapio_id: '1',
   });
@@ -14,45 +14,50 @@ function Index() {
   const [imagemPreview, setImagemPreview] = useState('');
 
   const handleChange = (e) => {
-    if (e.target.name === 'imagem') {
-      // Atualiza o preview da imagem
-      setImagemPreview(URL.createObjectURL(e.target.files[0]));
-    }
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleImageChange = (e) => {
-    setFormData({
-      ...formData,
-      imagem: e.target.files[0],
-    });
-    setImagemPreview(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        imagem: file,
+      }));
+      setImagemPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMensagem('Item preparado para cadastro!');
 
     const data = new FormData();
     data.append('nome_item', formData.nome);
     data.append('preco_item', formData.preco);
     data.append('descricao_item', formData.descricao_prod);
     data.append('cardapio_id', formData.cardapio_id);
-    data.append('foto_item', formData.imagem);  // Adicionando a imagem como "foto_item"
+    data.append('foto_item', formData.imagem);
 
     try {
-      const response = await axios.post('http://localhost:3000/cadastroI', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      await axios.post('http://localhost:3000/cadastroI', data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMensagem('Item cadastrado com sucesso!');
+      setFormData({
+        nome: '',
+        preco: '',
+        imagem: null,
+        descricao_prod: '',
+        cardapio_id: '1',
+      });
+      setImagemPreview('');
     } catch (error) {
+      console.error('Erro ao cadastrar item:', error);
       setMensagem('Erro ao cadastrar item!');
-      console.error('Erro no envio para o backend:', error);
     }
   };
 
@@ -63,15 +68,17 @@ function Index() {
           <div className="card shadow p-4 rounded-4">
             <h2 className="text-center mb-4">Cadastro de Itens</h2>
 
-            {mensagem && <div className="alert alert-success text-center">{mensagem}</div>}
+            {mensagem && (
+              <div className="alert alert-info text-center">{mensagem}</div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label">Nome do Item</label>
                 <input
                   type="text"
-                  className="form-control"
                   name="nome"
+                  className="form-control"
                   value={formData.nome}
                   onChange={handleChange}
                   required
@@ -83,8 +90,8 @@ function Index() {
                 <input
                   type="number"
                   step="0.01"
-                  className="form-control"
                   name="preco"
+                  className="form-control"
                   value={formData.preco}
                   onChange={handleChange}
                   required
@@ -95,8 +102,9 @@ function Index() {
                 <label className="form-label">Imagem</label>
                 <input
                   type="file"
-                  className="form-control"
                   name="imagem"
+                  className="form-control"
+                  accept="image/*"
                   onChange={handleImageChange}
                   required
                 />
@@ -115,8 +123,8 @@ function Index() {
               <div className="mb-3">
                 <label className="form-label">Descrição</label>
                 <textarea
-                  className="form-control"
                   name="descricao_prod"
+                  className="form-control"
                   value={formData.descricao_prod}
                   onChange={handleChange}
                   required
@@ -126,8 +134,8 @@ function Index() {
               <div className="mb-4">
                 <label className="form-label">Categoria</label>
                 <select
-                  className="form-select"
                   name="cardapio_id"
+                  className="form-select"
                   value={formData.cardapio_id}
                   onChange={handleChange}
                   required
@@ -140,7 +148,9 @@ function Index() {
               </div>
 
               <div className="d-grid">
-                <button type="submit" className="btn btn-success">Cadastrar Item</button>
+                <button type="submit" className="btn btn-success">
+                  Cadastrar Item
+                </button>
               </div>
             </form>
           </div>

@@ -1,15 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fileUpload = require('express-fileupload'); // <--- IMPORTANTE!!!
 
 const app = express();
 const PORT = 3000;
 
-// Middleware para permitir requisições do frontend
+// MIDDLEWARES
 app.use(cors());
-
-// Middleware para parsear JSON
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload()); // <--- AQUI ESTÁ O SEGREDO!!!
 
 // Servir arquivos estáticos da pasta 'public'
 app.use(express.static(path.join(__dirname, 'public')));

@@ -10,22 +10,22 @@ function SubCardapioGarcom() {
   const [pedido, setPedido] = useState({ nome_cliente: '', mesa: '', total: 0, itens: [] });
 
   useEffect(() => {
-   const token = localStorage.getItem("token");
-       if (!token) {
-         navigate("/login");
-         return;
-       }
-   
-       try {
-         const decoded = jwtDecode(token);
-         if (decoded.usuario_tipo !== "g" && decoded.usuario_tipo !== "a") {
-           navigate("/login"); // Se não for "c" nem "a", redireciona
-           return;
-         }
-       } catch (error) {
-         navigate("/login");
-         return;
-       }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.usuario_tipo !== "g" && decoded.usuario_tipo !== "a") {
+        navigate("/login");
+        return;
+      }
+    } catch (error) {
+      navigate("/login");
+      return;
+    }
 
     async function fetchProdutos() {
       const res = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
@@ -45,7 +45,7 @@ function SubCardapioGarcom() {
 
     const novaLista = [...pedido.itens];
     const index = novaLista.findIndex(item => item.sub_cardapio_id === id);
-    
+
     if (index >= 0) {
       novaLista[index].quantidade += delta;
       if (novaLista[index].quantidade <= 0) novaLista.splice(index, 1);
@@ -89,8 +89,8 @@ function SubCardapioGarcom() {
   return (
     <>
       <div className="container mt-3 mb-5 pb-5">
-        <h4 className="text-center">Pedido do Garçom</h4>
-        <div className="row mb-2">
+        <h4 className="text-center mb-3">Pedido do Garçom</h4>
+        <div className="row mb-3">
           <div className="col-6">
             <input className="form-control" placeholder="Cliente" value={pedido.nome_cliente} onChange={(e) => setPedido({ ...pedido, nome_cliente: e.target.value })} />
           </div>
@@ -99,15 +99,21 @@ function SubCardapioGarcom() {
           </div>
         </div>
 
-        <div className="row g-2">
+        <div className="row row-cols-1 row-cols-sm-2 g-3">
           {produtos.map((p) => {
             const qtd = pedido.itens.find(item => item.sub_cardapio_id === p.id_sup_cardapio)?.quantidade || 0;
             return (
-              <div className="col-6" key={p.id_sup_cardapio}>
+              <div className="col" key={p.id_sup_cardapio}>
                 <div className="card h-100">
+                  <img
+                    src={`http://localhost:3000/img/${p.imagem}`}
+                    className="card-img-top"
+                    alt={p.nome}
+                    style={{ height: '200px', objectFit: 'cover' }}
+                  />
                   <div className="card-body p-2">
-                    <h6>{p.nome}</h6>
-                    <p style={{ fontSize: '12px' }}>{p.descricao_prod}</p>
+                    <h6 className="card-title">{p.nome}</h6>
+                    <p className="card-text" style={{ fontSize: '12px' }}>{p.descricao_prod}</p>
                     <p><strong>R$ {parseFloat(p.preco).toFixed(2)}</strong></p>
                     <div className="d-flex align-items-center gap-2">
                       <button className="btn btn-sm btn-outline-danger" onClick={() => alterarQuantidade(p.id_sup_cardapio, -1)}>-</button>
