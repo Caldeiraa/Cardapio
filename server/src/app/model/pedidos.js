@@ -31,12 +31,13 @@ class Pedido {
         return new Promise((resolve, reject) => {
             const sql = `
                 SELECT 
-                    p.nome_cliente, p.mesa, p.data_hora,
+                    p.id_pedido, p.nome_cliente, p.mesa, p.data_hora,
                     ip.quantidade, ip.preco,
                     sc.nome AS item
                 FROM pedido p
                 JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
                 JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
+                WHERE p.status = 'pendente'
                 ORDER BY p.data_hora DESC
             `;
 
@@ -46,6 +47,26 @@ class Pedido {
             });
         });
     }
+
+    atualizarStatus(pedidoId) {
+        return new Promise((resolve, reject) => {
+            const sql = "UPDATE pedido SET status = 'preparado' WHERE id_pedido = ?";
+            this.conexao.query(sql, [pedidoId], (erro, resultado) => {
+                if (erro) return reject([500, erro]);
+                resolve([200, { mensagem: "Pedido marcado como preparado!" }]);
+            });
+        });
+    }
+    marcarItemComoPreparado(id_item) {
+        return new Promise((resolve, reject) => {
+            const sql = "UPDATE itens_pedido SET preparado = true WHERE id_item = ?";
+            this.conexao.query(sql, [id_item], (erro, resultado) => {
+                if (erro) reject([500, erro]);
+                else resolve([200, { mensagem: "Item marcado como preparado!" }]);
+            });
+        });
+    }
+    
 }
 
 module.exports = new Pedido();

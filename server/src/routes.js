@@ -13,8 +13,11 @@ routes.get('/getCadastroUs', (req, res) => {
 routes.get('/subCategoria/:id_cardapio', SubCardapio.index);
 routes.get("/pedidos", PedidoController.listar);
 
-routes.post('/usuarioC',Usuarios.create)
-routes.post('/login',Usuarios.logar)
+routes.put("/pedidos/:id/preparar", PedidoController.atualizarStatus);
+routes.put("/itens-pedido/:id_item/preparar", PedidoController.marcarComoPreparado);
+
+routes.post('/usuarioC', Usuarios.create);
+routes.post('/login', Usuarios.logar);
 routes.post("/pedido", PedidoController.criar);
 routes.post("/cadastroI", CadastroItem.create);
 

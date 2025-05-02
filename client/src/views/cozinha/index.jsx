@@ -18,7 +18,7 @@ function Index() {
     try {
       const decoded = jwtDecode(token);
       if (decoded.usuario_tipo !== "c" && decoded.usuario_tipo !== "a") {
-        navigate("/login"); // Se não for "c" nem "a", redireciona
+        navigate("/login");
         return;
       }
     } catch (error) {
@@ -37,8 +37,20 @@ function Index() {
       }
     };
 
-    fetchPedidos();
+    fetchPedidos(); // Carregamento inicial
+    const interval = setInterval(fetchPedidos, 5000); // Atualiza a cada 5s
+    return () => clearInterval(interval);
   }, [navigate]);
+
+  const marcarComoPronto = async (id_item) => {
+    try {
+      await axios.put(`http://localhost:3000/itens-pedido/${id_item}/preparar`);
+      // Remove o item marcado da lista localmente sem esperar o próximo refresh
+      setPedidos(prev => prev.filter(p => p.id_item !== id_item));
+    } catch (error) {
+      console.error('Erro ao marcar como pronto:', error);
+    }
+  };
 
   return (
     <div className="container mt-4">
@@ -56,6 +68,7 @@ function Index() {
                 <th>Data/Hora</th>
                 <th>Item</th>
                 <th>Quantidade</th>
+                <th>Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -66,8 +79,21 @@ function Index() {
                   <td>{new Date(pedido.data_hora).toLocaleString()}</td>
                   <td>{pedido.item}</td>
                   <td>{pedido.quantidade}</td>
+                  <td>
+                    <button
+                      className="btn btn-success btn-sm"
+                      onClick={() => marcarComoPronto(pedido.id_item)}
+                    >
+                      Marcar como Pronto
+                    </button>
+                  </td>
                 </tr>
               ))}
+              {pedidos.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center">Nenhum pedido pendente</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

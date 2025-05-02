@@ -22,6 +22,24 @@ class PedidoController {
             res.status(erro[0]).json("Erro: " + erro[1].errno);
         });
     }
+
+    atualizarStatus(req, res) {
+        const { id } = req.params;
+
+        Pedido.atualizarStatus(id)
+            .then(resposta => res.status(resposta[0]).json(resposta[1]))
+            .catch(erro => res.status(erro[0]).json("Erro: " + erro[1].errno));
+    }
+    marcarComoPreparado(req, res) {
+        const id_item = req.params.id_item;
+    
+        Pedido.marcarItemComoPreparado(id_item).then(resposta => {
+            res.status(resposta[0]).json(resposta[1]);
+        }).catch(erro => {
+            res.status(erro[0]).json("Erro: " + erro[1].errno);
+        });
+    }
+    
 }
 
 module.exports = new PedidoController();

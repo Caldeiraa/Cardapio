@@ -3,6 +3,11 @@ DROP DATABASE IF EXISTS lanchonete;
 CREATE DATABASE lanchonetes;
 USE lanchonetes;
 
+
+ALTER TABLE pedido ADD COLUMN status ENUM('pendente', 'preparado') DEFAULT 'pendente';
+
+ALTER TABLE itens_pedido ADD COLUMN preparado BOOLEAN DEFAULT false;
+
 -- TABELA DO CARDÁPIO PRINCIPAL
 CREATE TABLE cardapio (
 	id_cardapio INT PRIMARY KEY AUTO_INCREMENT,
@@ -29,9 +34,10 @@ CREATE TABLE usuario (
 	login VARCHAR(25) NOT NULL, 
 	senha VARCHAR(100) NOT NULL
 );
-
+select * from usuario;
 INSERT INTO usuario (nome_usuario, tipo_usuario, login, senha) VALUES
-('murilo', 'a', 'murilo.caldeira', 'murilo123');
+('murilo', 'a', 'murilo.caldeira', '123'),
+('a', 'a', '123', '123');
 
 -- TABELA DE PEDIDOS (com total agora)
 CREATE TABLE pedido (
@@ -55,8 +61,8 @@ CREATE TABLE itens_pedido (
 
 -- DADOS EXEMPLO
 INSERT INTO cardapio (nome_item, imagem_item) VALUES
-('Lanche', 'hamburguer.png'),
-('Espetinho', 'espetinho.png');
+('Sorvete', 'hamburguer.png'),
+('Bebidas', 'espetinho.png');
 
 INSERT INTO sub_cardapio (nome, preco, imagem, descricao_prod, cardapio_id) VALUES
 ('X-Tudo', 12.50, 'xtudo.png', 'Pão, carne, ovo, bacon, queijo, salada', 1),
@@ -82,3 +88,5 @@ FROM pedido p
 JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
 JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
 ORDER BY p.data_hora DESC;
+
+select * from sub_cardapio;
