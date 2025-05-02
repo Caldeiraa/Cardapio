@@ -30,16 +30,18 @@ class Pedido {
     listarPedidosComItens() {
         return new Promise((resolve, reject) => {
             const sql = `
-                SELECT 
-                    p.id_pedido, p.nome_cliente, p.mesa, p.data_hora,
-                    ip.quantidade, ip.preco,
-                    sc.nome AS item
-                FROM pedido p
-                JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
-                JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
-                WHERE p.status = 'pendente'
-                ORDER BY p.data_hora DESC
-            `;
+    SELECT 
+        p.id_pedido, p.nome_cliente, p.mesa, p.data_hora,
+        ip.id_item, ip.quantidade, ip.preco, ip.preparado,
+        sc.nome AS item
+    FROM pedido p
+    JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
+    JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
+    WHERE p.status = 'pendente'
+    ORDER BY p.data_hora DESC
+`;
+
+
 
             this.conexao.query(sql, (erro, resultado) => {
                 if (erro) reject([500, erro]);
@@ -66,6 +68,25 @@ class Pedido {
             });
         });
     }
+
+    buscarPedidosPorDataHora(inicio, fim) {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT 
+                    p.id_pedido, p.nome_cliente, p.mesa, p.data_hora, p.total
+                FROM pedido p
+                WHERE p.data_hora BETWEEN ? AND ?
+                  AND p.status = 'preparado'
+                ORDER BY p.data_hora ASC
+            `;
+    
+            this.conexao.query(sql, [inicio, fim], (erro, resultado) => {
+                if (erro) reject([500, erro]);
+                else resolve([200, resultado]);
+            });
+        });
+    }
+    
     
 }
 

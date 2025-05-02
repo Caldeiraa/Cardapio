@@ -10,6 +10,7 @@ import CadastroU from './views/cadastroUsuarios/index';
 import CardapioG from './views/garcon/cardapio'
 import Cozinha from './views/cozinha/index'
 import CadastroItens from './views/cadastroItens/index'
+import FechamentoCaixa from './views/Fechamento/index';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastroU" element={<CadastroU />} />
         <Route path="/cadastroI" element={<CadastroItens />} />
+        <Route path="/fechamento" element={<FechamentoCaixa />} />
       </Routes>
     </BrowserRouter>
   );

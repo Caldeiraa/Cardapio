@@ -12,6 +12,7 @@ routes.get('/getCadastroUs', (req, res) => {
 
 routes.get('/subCategoria/:id_cardapio', SubCardapio.index);
 routes.get("/pedidos", PedidoController.listar);
+routes.get("/fechamento-caixa", PedidoController.buscarPorDataHora);
 
 routes.put("/pedidos/:id/preparar", PedidoController.atualizarStatus);
 routes.put("/itens-pedido/:id_item/preparar", PedidoController.marcarComoPreparado);

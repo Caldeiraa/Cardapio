@@ -44,6 +44,12 @@ function Navbar() {
               <button className="btn btn-primary me-2" onClick={() => navigate("/cozinha")}>
                 Pedidos da Cozinha
               </button>
+              <button className="btn btn-primary me-2" onClick={() => navigate("/cadastroi")}>
+                Cadastro de item
+              </button>
+              <button className="btn btn-primary me-2" onClick={() => navigate("/fechamento")}>
+                Fechamento 
+              </button>
             </>
           )}
 

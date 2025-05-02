@@ -40,6 +40,25 @@ class PedidoController {
         });
     }
     
+    buscarPorDataHora(req, res) {
+        const { inicio, fim } = req.query;
+
+        if (!inicio || !fim) {
+            return res.status(400).json("Data e hora de início e fim são obrigatórias.");
+        }
+
+        // Converte as datas para o formato adequado, caso seja necessário
+        const formattedInicio = inicio.replace('T', ' ').substring(0, 19); // YYYY-MM-DD HH:mm:ss
+        const formattedFim = fim.replace('T', ' ').substring(0, 19); // YYYY-MM-DD HH:mm:ss
+
+        Pedido.buscarPedidosPorDataHora(formattedInicio, formattedFim).then(resposta => {
+            res.status(resposta[0]).json(resposta[1]);
+        }).catch(erro => {
+            res.status(erro[0]).json("Erro: " + erro[1].errno);
+        });
+    }
+    
+
 }
 
 module.exports = new PedidoController();

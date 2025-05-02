@@ -49,8 +49,13 @@ function Index() {
       setMensagem('Funcionário cadastrado com sucesso!');
       // Redireciona para o login após o cadastro
       setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000); // Tempo para mostrar a mensagem antes de redirecionar
+        setFormData({
+          nome_usuario: '',
+          tipo_usuario: 'g',
+          login: '',
+          senha: ''
+        });
+      }, 1000); // Tempo para mostrar a mensagem antes de redirecionar
     } catch (error) {
       setMensagem('Erro ao cadastrar funcionário.');
     }

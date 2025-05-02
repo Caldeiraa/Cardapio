@@ -10,20 +10,15 @@ function Index() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    if (!token) return navigate("/login");
 
     try {
       const decoded = jwtDecode(token);
       if (decoded.usuario_tipo !== "c" && decoded.usuario_tipo !== "a") {
-        navigate("/login");
-        return;
+        return navigate("/login");
       }
-    } catch (error) {
-      navigate("/login");
-      return;
+    } catch {
+      return navigate("/login");
     }
 
     const fetchPedidos = async () => {
@@ -37,18 +32,35 @@ function Index() {
       }
     };
 
-    fetchPedidos(); // Carregamento inicial
-    const interval = setInterval(fetchPedidos, 5000); // Atualiza a cada 5s
+    fetchPedidos();
+    const interval = setInterval(fetchPedidos, 5000);
     return () => clearInterval(interval);
   }, [navigate]);
 
-  const marcarComoPronto = async (id_item) => {
+  const marcarItemComoPronto = async (id_item, id_pedido) => {
     try {
       await axios.put(`http://localhost:3000/itens-pedido/${id_item}/preparar`);
-      // Remove o item marcado da lista localmente sem esperar o próximo refresh
-      setPedidos(prev => prev.filter(p => p.id_item !== id_item));
+
+      // Atualiza o estado local para marcar o item como preparado
+      setPedidos(prev =>
+        prev.map(p =>
+          p.id_item === id_item ? { ...p, preparado: true } : p
+        )
+      );
+
+      // Verifica se todos os itens do mesmo pedido estão preparados
+      const itensDoPedido = pedidos.filter(p => p.id_pedido === id_pedido);
+      const todosPreparados = itensDoPedido.every(p =>
+        p.id_item === id_item ? true : p.preparado
+      );
+
+      if (todosPreparados) {
+        await axios.put(`http://localhost:3000/pedidos/${id_pedido}/preparar`);
+        // Remove todos os itens desse pedido da lista
+        setPedidos(prev => prev.filter(p => p.id_pedido !== id_pedido));
+      }
     } catch (error) {
-      console.error('Erro ao marcar como pronto:', error);
+      console.error('Erro ao marcar item como preparado:', error);
     }
   };
 
@@ -80,12 +92,16 @@ function Index() {
                   <td>{pedido.item}</td>
                   <td>{pedido.quantidade}</td>
                   <td>
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => marcarComoPronto(pedido.id_item)}
-                    >
-                      Marcar como Pronto
-                    </button>
+                    {pedido.preparado ? (
+                      <span className="badge bg-success">Pronto</span>
+                    ) : (
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => marcarItemComoPronto(pedido.id_item, pedido.id_pedido)}
+                      >
+                        Marcar como Pronto
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
