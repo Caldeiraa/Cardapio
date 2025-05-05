@@ -1,4 +1,10 @@
-Criar um sistema de lanchonete
-onde é possivel q o cliente da lanchonnete veja o cardapio somente
-o garçon consiga fazer o pedido de forma simples e facil
-e a cozinha consiga ve o que foi pedido 
+sistema de lanchonete
+onde é possivel que o cliente da lanchonete tenha acesso somente ao cardapio 
+o garçom tenha acesso somente ao cardapio de pedidos
+a cozinha tenha acesso somente a tela de pedidos e consiga marcar pedidos finalizados
+Somente o gerente consegue ter acesso a todas as telas
+O gerente é o cargo mais alto de acesso
+Ele consegue adicionar Login para garçom
+Consegue adicionar itens e remover
+consegue ve o faturamento dos dias passados atraves da tela de fechamento de caixa e exportar para excel
+ 
