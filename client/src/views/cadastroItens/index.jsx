@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode'; // Corrigido o nome da função
+import { useNavigate } from 'react-router-dom';
 
 function Index() {
   const [formData, setFormData] = useState({
@@ -9,10 +11,29 @@ function Index() {
     descricao_prod: '',
     cardapio_id: '1',
   });
-
+  const navigate = useNavigate();
   const [mensagem, setMensagem] = useState('');
   const [imagemPreview, setImagemPreview] = useState('');
 
+   useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+  
+      try {
+        const decoded = jwtDecode(token);
+        if (decoded.usuario_tipo !== "a") {
+          navigate("/login"); // Se não for da cozinha, redireciona para login
+          return;
+        }
+      } catch (error) {
+        navigate("/login");
+        return;
+      }
+    }, [navigate]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
