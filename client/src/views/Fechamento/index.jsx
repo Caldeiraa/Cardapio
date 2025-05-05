@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-// Função para formatar a data para o formato YYYY-MM-DD HH:mm:ss
 const formatDate = (date) => {
   const d = new Date(date);
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1).toString().padStart(2, '0');
-  const day = d.getDate().toString().padStart(2, '0');
-  const hours = d.getHours().toString().padStart(2, '0');
-  const minutes = d.getMinutes().toString().padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}:00`;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
 };
 
 function FechamentoCaixa() {
@@ -20,59 +16,51 @@ function FechamentoCaixa() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalFinal, setTotalFinal] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (dataInicio && dataFim) {
-      fetchPedidos();
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.usuario_tipo !== "a") return navigate("/login");
+    } catch {
+      return navigate("/login");
     }
+
+    if (dataInicio && dataFim) fetchPedidos();
   }, [dataInicio, dataFim]);
 
   const fetchPedidos = async () => {
     setLoading(true);
     setError(null);
-
     try {
-      // Verifique os dados que estão sendo enviados para garantir que a data está no formato correto
-      const formattedDataInicio = formatDate(dataInicio);
-      const formattedDataFim = formatDate(dataFim);
-
-      console.log("Consultando pedidos entre:", formattedDataInicio, "e", formattedDataFim);
-
       const response = await axios.get('http://localhost:3000/fechamento-caixa', {
-        params: { inicio: formattedDataInicio, fim: formattedDataFim },
+        params: {
+          inicio: formatDate(dataInicio),
+          fim: formatDate(dataFim)
+        }
       });
 
       if (response.data.length === 0) {
-        setError('Nenhum pedido encontrado para o intervalo selecionado.');
+        setError('Nenhum pedido encontrado.');
       } else {
         setPedidos(response.data);
         const total = response.data.reduce((acc, pedido) => acc + pedido.total_item, 0);
         setTotalFinal(total);
       }
-    } catch (error) {
-      setError('Erro ao buscar pedidos. Tente novamente.');
-      console.error("Erro ao buscar pedidos:", error);
+    } catch (err) {
+      console.error(err);
+      setError('Erro ao buscar pedidos.');
     } finally {
       setLoading(false);
     }
   };
 
   const exportToExcel = () => {
-    if (pedidos.length === 0) {
-      alert("Não há dados para exportar.");
-      return;
-    }
-
+    if (pedidos.length === 0) return alert("Nenhum dado para exportar.");
     const wsData = [
-      [
-        "ID Pedido",
-        "Cliente",
-        "Mesa",
-        "Data/Hora",
-        "Item",
-        "Quantidade",
-        "Total do Item (R$)"
-      ],
+      ["ID Pedido", "Cliente", "Mesa", "Data/Hora", "Item", "Qtd", "Total (R$)"],
       ...pedidos.map(p => [
         p.id_pedido,
         p.nome_cliente,
@@ -86,54 +74,18 @@ function FechamentoCaixa() {
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-    // Formatando cabeçalhos em negrito
-    const headerStyle = {
-      font: { bold: true },
-      alignment: { horizontal: "center" },
-      fill: { fgColor: { rgb: "D9D9D9" } }
-    };
-
-    const columnWidths = [
-      { wch: 10 },  // ID
-      { wch: 20 },  // Cliente
-      { wch: 10 },  // Mesa
-      { wch: 20 },  // Data/Hora
-      { wch: 25 },  // Item
-      { wch: 12 },  // Quantidade
-      { wch: 18 }   // Total do Item
-    ];
-
-    ws["!cols"] = columnWidths;
-
-    // Aplica o estilo de cabeçalho (linha 1: A1 até G1)
-    const cols = ["A", "B", "C", "D", "E", "F", "G"];
-    cols.forEach((col) => {
-      const cell = ws[col + "1"];
-      if (cell) {
-        cell.s = headerStyle;
-      }
-    });
-
-    // Formatação de moeda para total
-    const totalCell = ws["G" + (wsData.length)];
-    if (totalCell) {
-      totalCell.s = {
-        numFmt: '"R$" #,##0.00'
-      };
-    }
-
-    // Criação do workbook e exportação
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Fechamento");
     XLSX.writeFile(wb, "fechamento_caixa.xlsx");
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">Fechamento de Caixa</h2>
-      <div className="row mb-4">
-        <div className="col">
+    <div className="container py-4">
+      <h2 className="text-center mb-4">📊 Fechamento de Caixa</h2>
+
+      <div className="row g-3 mb-4">
+        <div className="col-md-5">
+          <label className="form-label">Início</label>
           <input
             type="datetime-local"
             className="form-control"
@@ -141,7 +93,8 @@ function FechamentoCaixa() {
             onChange={(e) => setDataInicio(e.target.value)}
           />
         </div>
-        <div className="col">
+        <div className="col-md-5">
+          <label className="form-label">Fim</label>
           <input
             type="datetime-local"
             className="form-control"
@@ -149,59 +102,53 @@ function FechamentoCaixa() {
             onChange={(e) => setDataFim(e.target.value)}
           />
         </div>
-        <div className="col">
-          <button
-            className="btn btn-primary"
-            onClick={fetchPedidos}
-            disabled={loading}
-          >
-            Buscar Pedidos
+        <div className="col-md-2 d-grid align-items-end">
+          <button className="btn btn-primary" onClick={fetchPedidos} disabled={loading}>
+            {loading ? "Buscando..." : "Buscar"}
           </button>
         </div>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-warning text-center">{error}</div>}
 
-      <div className="text-center mb-4">
-        <button
-          className="btn btn-success"
-          onClick={exportToExcel}
-          disabled={pedidos.length === 0}
-        >
-          Exportar para Excel
+      <div className="text-end mb-3">
+        <button className="btn btn-success" onClick={exportToExcel} disabled={pedidos.length === 0}>
+          📁 Exportar para Excel
         </button>
       </div>
 
-      {loading ? (
-        <div className="text-center">Carregando...</div>
-      ) : (
-        <div className="table-responsive">
-          <table className="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>Nome Cliente</th>
-                <th>Mesa</th>
-                <th>Data/Hora</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pedidos.length > 0 ? (
-                pedidos.map((pedido, index) => (
-                  <tr key={index}>
-                    <td>{pedido.nome_cliente}</td>
-                    <td>{pedido.mesa}</td>
-                    <td>{new Date(pedido.data_hora).toLocaleString()}</td>
-                    <td>R$ {Number(pedido.total_item).toFixed(2)}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center">Nenhum pedido encontrado</td>
+      <div className="table-responsive">
+        <table className="table table-hover align-middle">
+          <thead className="table-dark">
+            <tr>
+              <th>Cliente</th>
+              <th>Mesa</th>
+              <th>Data/Hora</th>
+              <th>Total (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pedidos.length > 0 ? (
+              pedidos.map((pedido, index) => (
+                <tr key={index}>
+                  <td>{pedido.nome_cliente}</td>
+                  <td>{pedido.mesa}</td>
+                  <td>{new Date(pedido.data_hora).toLocaleString()}</td>
+                  <td>R$ {Number(pedido.total_item).toFixed(2)}</td>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center">Nenhum pedido exibido</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {pedidos.length > 0 && (
+        <div className="text-end mt-3 fw-bold">
+          Total Final: <span className="text-success">R$ {totalFinal.toFixed(2)}</span>
         </div>
       )}
     </div>

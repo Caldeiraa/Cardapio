@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import './navbar.css';
 
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -17,48 +19,43 @@ function Navbar() {
     }
   }
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
+  const handleBack = () => navigate(-1);
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate("/login");
   };
 
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+
   return (
-    <div>
-      <nav className="navbar navbar-light bg-light">
-        <div className="container-fluid d-flex align-items-center">
-          <button className="btn btn-secondary me-2" onClick={handleBack}>Voltar</button>
+    <nav className="custom-navbar">
+      <div className="navbar-container">
+        <div className="left-section">
+          <button className="nav-btn neutral" onClick={handleBack}>⟵ Voltar</button>
+        </div>
 
-          {/* Botões especiais para ADM */}
-          {usuarioTipo === "a" && (
-            <>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/cadastroU")}>
-                Cadastro de Usuários
-              </button>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/garcom/cardapio")}>
-                Cardápio do Garçom
-              </button>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/cozinha")}>
-                Pedidos da Cozinha
-              </button>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/cadastroi")}>
-                Cadastro de item
-              </button>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/fechamento")}>
-                Fechamento 
-              </button>
-            </>
-          )}
+        <div className="center-section">
+          <div className="hamburger" onClick={toggleMenu}>☰</div>
+          <div className={`nav-links ${menuOpen ? 'show' : ''}`}>
+            {usuarioTipo === "a" && (
+              <>
+                <button className="nav-btn" onClick={() => navigate("/cadastroU")}>Usuários</button>
+                <button className="nav-btn" onClick={() => navigate("/garcom/cardapio")}>Garçom</button>
+                <button className="nav-btn" onClick={() => navigate("/cozinha")}>Cozinha</button>
+                <button className="nav-btn" onClick={() => navigate("/cadastroi")}>Itens</button>
+                <button className="nav-btn" onClick={() => navigate("/fechamento")}>Fechamento</button>
+              </>
+            )}
+          </div>
+        </div>
 
+        <div className="right-section">
           {token && (
-            <button className="btn btn-danger ms-auto" onClick={handleLogout}>Logoff</button>
+            <button className="nav-btn danger" onClick={handleLogout}>Logoff</button>
           )}
         </div>
-      </nav>
-    </div>
+      </div>
+    </nav>
   );
 }
 

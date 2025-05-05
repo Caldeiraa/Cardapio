@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
-
+import 'bootstrap/dist/css/bootstrap.min.css'; // Importando o Bootstrap
+import './Pedidos.css'
 function Index() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,14 +42,12 @@ function Index() {
     try {
       await axios.put(`http://localhost:3000/itens-pedido/${id_item}/preparar`);
 
-      // Atualiza o estado local para marcar o item como preparado
       setPedidos(prev =>
         prev.map(p =>
           p.id_item === id_item ? { ...p, preparado: true } : p
         )
       );
 
-      // Verifica se todos os itens do mesmo pedido estão preparados
       const itensDoPedido = pedidos.filter(p => p.id_pedido === id_pedido);
       const todosPreparados = itensDoPedido.every(p =>
         p.id_item === id_item ? true : p.preparado
@@ -56,7 +55,6 @@ function Index() {
 
       if (todosPreparados) {
         await axios.put(`http://localhost:3000/pedidos/${id_pedido}/preparar`);
-        // Remove todos os itens desse pedido da lista
         setPedidos(prev => prev.filter(p => p.id_pedido !== id_pedido));
       }
     } catch (error) {
@@ -66,26 +64,26 @@ function Index() {
 
   return (
     <div className="container mt-4">
-      <h2 className="text-center mb-4">Pedidos Realizados</h2>
+      <h2 className="text-center">Pedidos Realizados</h2>
 
       {loading ? (
         <div className="text-center">Carregando...</div>
       ) : (
         <div className="table-responsive">
-          <table className="table table-bordered table-striped">
-            <thead>
+          <table className="table table-bordered table-striped table-hover">
+            <thead className="thead-dark">
               <tr>
-                <th>Nome Cliente</th>
+                <th>Cliente</th>
                 <th>Mesa</th>
                 <th>Data/Hora</th>
                 <th>Item</th>
-                <th>Quantidade</th>
+                <th>Qtd</th>
                 <th>Ação</th>
               </tr>
             </thead>
             <tbody>
               {pedidos.map((pedido, index) => (
-                <tr key={index}>
+                <tr key={index} className={pedido.preparado ? 'table-success' : ''}>
                   <td>{pedido.nome_cliente}</td>
                   <td>{pedido.mesa}</td>
                   <td>{new Date(pedido.data_hora).toLocaleString()}</td>
@@ -93,10 +91,10 @@ function Index() {
                   <td>{pedido.quantidade}</td>
                   <td>
                     {pedido.preparado ? (
-                      <span className="badge bg-success">Pronto</span>
+                      <span className="badge badge-success">Pronto</span>
                     ) : (
                       <button
-                        className="btn btn-success btn-sm"
+                        className="btn btn-success"
                         onClick={() => marcarItemComoPronto(pedido.id_item, pedido.id_pedido)}
                       >
                         Marcar como Pronto
@@ -107,7 +105,7 @@ function Index() {
               ))}
               {pedidos.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center">Nenhum pedido pendente</td>
+                  <td colSpan="6" className="text-center text-muted">Nenhum pedido pendente</td>
                 </tr>
               )}
             </tbody>

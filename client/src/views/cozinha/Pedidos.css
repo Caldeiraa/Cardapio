@@ -1,0 +1,57 @@
+/* Pedidos.css */
+
+/* Ajustes para o título */
+.pedidos-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .pedidos-title {
+    font-size: 1.6rem;
+  }
+  
+  .no-data {
+    font-size: 1rem;
+  }
+  
+  /* Ajustes para o layout da tabela */
+  .table th,
+  .table td {
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table th {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  .table td {
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    .table th,
+    .table td {
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+  
+    .table-responsive {
+      overflow-x: auto;
+    }
+  
+    .btn {
+      font-size: 0.85rem;
+      padding: 0.3rem 0.5rem;
+    }
+  
+    .pedidos-title {
+      font-size: 1.5rem;
+    }
+  }
+  
