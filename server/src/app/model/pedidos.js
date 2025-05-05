@@ -73,11 +73,20 @@ class Pedido {
         return new Promise((resolve, reject) => {
             const sql = `
                 SELECT 
-                    p.id_pedido, p.nome_cliente, p.mesa, p.data_hora, p.total
+                    p.id_pedido,
+                    p.nome_cliente,
+                    p.mesa,
+                    p.data_hora,
+                    p.total AS total_pedido,
+                    sc.nome AS item,
+                    ip.quantidade,
+                    (ip.quantidade * sc.preco) AS total_item
                 FROM pedido p
+                JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
+                JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
                 WHERE p.data_hora BETWEEN ? AND ?
                   AND p.status = 'preparado'
-                ORDER BY p.data_hora ASC
+                ORDER BY p.data_hora ASC, p.id_pedido, sc.nome
             `;
     
             this.conexao.query(sql, [inicio, fim], (erro, resultado) => {
@@ -85,7 +94,9 @@ class Pedido {
                 else resolve([200, resultado]);
             });
         });
+        
     }
+    
     
     
 }

@@ -19,6 +19,7 @@ function FechamentoCaixa() {
   const [dataFim, setDataFim] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [totalFinal, setTotalFinal] = useState(0);
 
   useEffect(() => {
     if (dataInicio && dataFim) {
@@ -43,9 +44,11 @@ function FechamentoCaixa() {
 
       if (response.data.length === 0) {
         setError('Nenhum pedido encontrado para o intervalo selecionado.');
+      } else {
+        setPedidos(response.data);
+        const total = response.data.reduce((acc, pedido) => acc + pedido.total_item, 0);
+        setTotalFinal(total);
       }
-
-      setPedidos(response.data);
     } catch (error) {
       setError('Erro ao buscar pedidos. Tente novamente.');
       console.error("Erro ao buscar pedidos:", error);
@@ -60,10 +63,69 @@ function FechamentoCaixa() {
       return;
     }
 
-    const ws = XLSX.utils.json_to_sheet(pedidos);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+    const wsData = [
+      [
+        "ID Pedido",
+        "Cliente",
+        "Mesa",
+        "Data/Hora",
+        "Item",
+        "Quantidade",
+        "Total do Item (R$)"
+      ],
+      ...pedidos.map(p => [
+        p.id_pedido,
+        p.nome_cliente,
+        p.mesa,
+        new Date(p.data_hora).toLocaleString(),
+        p.item,
+        p.quantidade,
+        Number(p.total_item).toFixed(2)
+      ]),
+      ["", "", "", "", "", "Total Geral", totalFinal.toFixed(2)]
+    ];
 
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Formatando cabeçalhos em negrito
+    const headerStyle = {
+      font: { bold: true },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "D9D9D9" } }
+    };
+
+    const columnWidths = [
+      { wch: 10 },  // ID
+      { wch: 20 },  // Cliente
+      { wch: 10 },  // Mesa
+      { wch: 20 },  // Data/Hora
+      { wch: 25 },  // Item
+      { wch: 12 },  // Quantidade
+      { wch: 18 }   // Total do Item
+    ];
+
+    ws["!cols"] = columnWidths;
+
+    // Aplica o estilo de cabeçalho (linha 1: A1 até G1)
+    const cols = ["A", "B", "C", "D", "E", "F", "G"];
+    cols.forEach((col) => {
+      const cell = ws[col + "1"];
+      if (cell) {
+        cell.s = headerStyle;
+      }
+    });
+
+    // Formatação de moeda para total
+    const totalCell = ws["G" + (wsData.length)];
+    if (totalCell) {
+      totalCell.s = {
+        numFmt: '"R$" #,##0.00'
+      };
+    }
+
+    // Criação do workbook e exportação
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Fechamento");
     XLSX.writeFile(wb, "fechamento_caixa.xlsx");
   };
 
@@ -130,7 +192,7 @@ function FechamentoCaixa() {
                     <td>{pedido.nome_cliente}</td>
                     <td>{pedido.mesa}</td>
                     <td>{new Date(pedido.data_hora).toLocaleString()}</td>
-                    <td>R$ {Number(pedido.total).toFixed(2)}</td>
+                    <td>R$ {Number(pedido.total_item).toFixed(2)}</td>
                   </tr>
                 ))
               ) : (
