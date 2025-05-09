@@ -18,8 +18,11 @@ CREATE TABLE sub_cardapio (
 	imagem VARCHAR(100),
 	descricao_prod VARCHAR(150),
 	cardapio_id INT,
+    ativo BOOLEAN NOT NULL DEFAULT true,
 	FOREIGN KEY (cardapio_id) REFERENCES cardapio(id_cardapio)
 );
+
+
 
 -- TABELA DE USUÁRIOS
 CREATE TABLE usuario (
