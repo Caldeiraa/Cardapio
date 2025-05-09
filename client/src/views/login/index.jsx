@@ -39,6 +39,7 @@ function Login() {
       console.error('Erro ao fazer login:', error.response?.data || error.message);
       alert('Usuário ou senha inválidos.');
     }
+    
   };
 
   return (

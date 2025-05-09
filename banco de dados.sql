@@ -3,11 +3,6 @@ DROP DATABASE IF EXISTS lanchonete;
 CREATE DATABASE lanchonetes;
 USE lanchonetes;
 
-
-ALTER TABLE pedido ADD COLUMN status ENUM('pendente', 'preparado') DEFAULT 'pendente';
-
-ALTER TABLE itens_pedido ADD COLUMN preparado BOOLEAN DEFAULT false;
-
 -- TABELA DO CARDÁPIO PRINCIPAL
 CREATE TABLE cardapio (
 	id_cardapio INT PRIMARY KEY AUTO_INCREMENT,
@@ -31,19 +26,19 @@ CREATE TABLE usuario (
 	id_usuario INT PRIMARY KEY AUTO_INCREMENT,
 	nome_usuario VARCHAR(25),
 	tipo_usuario CHAR(1) DEFAULT 'g',
+    ativo BOOLEAN DEFAULT true,
 	login VARCHAR(25) NOT NULL, 
 	senha VARCHAR(100) NOT NULL
 );
 select * from usuario;
-INSERT INTO usuario (nome_usuario, tipo_usuario, login, senha) VALUES
-('murilo', 'a', 'murilo.caldeira', '123'),
-('a', 'a', '123', '123');
+
 
 -- TABELA DE PEDIDOS (com total agora)
 CREATE TABLE pedido (
 	id_pedido INT PRIMARY KEY AUTO_INCREMENT,
 	nome_cliente VARCHAR(50),
 	mesa INT,
+     status ENUM('pendente', 'preparado') DEFAULT 'pendente',
 	total DECIMAL(10,2),
 	data_hora DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -54,6 +49,7 @@ CREATE TABLE itens_pedido (
 	quantidade INT NOT NULL,
 	preco DECIMAL(10,2),
 	pedido_id INT,
+    preparado BOOLEAN DEFAULT false,
 	sub_cardapio_id INT,
 	FOREIGN KEY (pedido_id) REFERENCES pedido(id_pedido),
 	FOREIGN KEY (sub_cardapio_id) REFERENCES sub_cardapio(id_sup_cardapio)
@@ -61,20 +57,10 @@ CREATE TABLE itens_pedido (
 
 -- DADOS EXEMPLO
 INSERT INTO cardapio (nome_item, imagem_item) VALUES
+('hamburguer', 'hamburguer.png'),
+('espetinho', 'espetinho.png'),
 ('Sorvete', 'hamburguer.png'),
 ('Bebidas', 'espetinho.png');
-
-INSERT INTO sub_cardapio (nome, preco, imagem, descricao_prod, cardapio_id) VALUES
-('X-Tudo', 12.50, 'xtudo.png', 'Pão, carne, ovo, bacon, queijo, salada', 1),
-('Sorvete', 6.00, 'sorvete.png', 'Sorvete de creme com cobertura', 1),
-('Espetinho de Boi', 5.00, 'espetinho.png', 'Espetinho de boi com molho e farinha', 2);
-
--- EXEMPLO DE PEDIDO
-INSERT INTO pedido (nome_cliente, mesa, total) VALUES ('Murilo', 10, 31.00);
-
-INSERT INTO itens_pedido (quantidade, preco, pedido_id, sub_cardapio_id) VALUES
-(2, 12.50, 1, 1),  -- 2 X-Tudo
-(1, 6.00, 1, 2);   -- 1 Sorvete
 
 -- CONSULTA PARA A COZINHA VER PEDIDOS
 SELECT 
@@ -90,3 +76,21 @@ JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
 ORDER BY p.data_hora DESC;
 
 select * from sub_cardapio;
+
+SELECT 
+    p.id_pedido,
+    p.nome_cliente,
+    p.mesa,
+    p.data_hora,
+    p.total AS total_pedido,
+    sc.nome AS item,
+    ip.quantidade,
+    (ip.quantidade * sc.preco) AS total_item
+FROM pedido p
+JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
+JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
+WHERE p.data_hora BETWEEN '2025-05-01 00:00:00' AND '2025-05-04 23:59:59'
+  AND p.status = 'preparado'
+ORDER BY p.data_hora ASC, p.id_pedido, sc.nome;
+
+

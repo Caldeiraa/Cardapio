@@ -26,7 +26,7 @@ class CadastroUsuario {
     verificaUsuarioSenha(login, senha) {
         return new Promise((resolve, reject) => {
             const sql = 'SELECT * FROM usuario WHERE login = ?';
-
+    
             this.conexao.query(sql, [login], (erro, resultado) => {
                 if (erro) {
                     reject([400, erro]);
@@ -34,10 +34,21 @@ class CadastroUsuario {
                     resolve([401, "Usuário ou senha inválidos"]);
                 } else {
                     const usuario = resultado[0];
+    
+                    if (!usuario.ativo) {
+                        return resolve([403, "Usuário desativado."]);
+                    }
+    
                     const senhaCorreta = bcrypt.compareSync(senha, usuario.senha);
-
+    
                     if (senhaCorreta) {
-                        resolve([200, "Logado com sucesso", usuario.id_usuario, usuario.tipo_usuario, usuario.nome_usuario]);
+                        resolve([
+                            200,
+                            "Logado com sucesso",
+                            usuario.id_usuario,
+                            usuario.tipo_usuario,
+                            usuario.nome_usuario
+                        ]);
                     } else {
                         resolve([401, "Usuário ou senha inválidos"]);
                     }
@@ -45,21 +56,28 @@ class CadastroUsuario {
             });
         });
     }
-    /*
-    buscarNomeUsuario(id_usuario) {
+    
+    desativarUsuario(id_usuario) {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT nome_usuario FROM usuario WHERE id_usuario = ?';
+            const sql = 'UPDATE usuario SET ativo = false WHERE id_usuario = ?';
             this.conexao.query(sql, [id_usuario], (erro, resultado) => {
+                if (erro) reject([400, erro]);
+                else resolve([200, "Usuário desativado com sucesso"]);
+            });
+        });
+    }
+    listarUsuarios() {
+        return new Promise((resolve, reject) => {
+            const sql = 'SELECT id_usuario, nome_usuario, tipo_usuario, login, ativo FROM usuario';
+            this.conexao.query(sql, (erro, resultado) => {
                 if (erro) {
-                    reject(erro);
-                } else if (resultado.length > 0) {
-                    resolve(resultado[0].nome_usuario);
+                    reject([500, erro]);
                 } else {
-                    reject(new Error("Usuário não encontrado"));
+                    resolve([200, resultado]);
                 }
             });
         });
-    }*/
+    }    
 }
 
 module.exports = new CadastroUsuario();

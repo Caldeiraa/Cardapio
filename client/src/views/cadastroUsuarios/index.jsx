@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode'; // Corrigido o nome da função
 import { useNavigate } from 'react-router-dom';
+import './CadastroU.css'
 
 function Index() {
   const navigate = useNavigate();

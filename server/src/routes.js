@@ -6,16 +6,17 @@ const Usuarios = require('../src/app/controller/usuarioController');
 const PedidoController = require("../src/app/controller/pedidosController");
 const CadastroItem = require("../src/app/controller/cadastroItemController");
 
-routes.get('/getCadastroUs', (req, res) => {
-  res.sendFile('usuario2.html', { root: './public' });
-});
-
 routes.get('/subCategoria/:id_cardapio', SubCardapio.index);
 routes.get("/pedidos", PedidoController.listar);
 routes.get("/fechamento-caixa", PedidoController.buscarPorDataHora);
+routes.get('/usuarios', Usuarios.listar);
+routes.get('/subcardapio',CadastroItem.listar)
 
 routes.put("/pedidos/:id/preparar", PedidoController.atualizarStatus);
 routes.put("/itens-pedido/:id_item/preparar", PedidoController.marcarComoPreparado);
+routes.put('/usuarios/:id_usuario/desativar', Usuarios.desativar);
+routes.put('/:id/ativar', CadastroItem.ativar);
+routes.put('/:id/desativar', CadastroItem.desativar);
 
 routes.post('/usuarioC', Usuarios.create);
 routes.post('/login', Usuarios.logar);
