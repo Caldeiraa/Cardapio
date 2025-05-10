@@ -28,7 +28,7 @@ function SubCardapioGarcom() {
     }
 
     async function fetchProdutos() {
-      const res = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
+      const res = await fetch(`http://192.168.0.68:3000/subCategoria/${id_cardapio}`);
       const data = await res.json();
       setProdutos(data);
     }

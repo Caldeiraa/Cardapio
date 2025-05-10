@@ -31,7 +31,7 @@ function SubCardapioList() {
     async function fetchItens() {
       try {
         const res = await 
-        axios.get('http://localhost:3000/subcardapio')
+        axios.get('http://192.168.0.68:3000/subcardapio')
 
         setItens(res.data[1] || []); // considerando que retorna [200, dados]
       } catch (err) {

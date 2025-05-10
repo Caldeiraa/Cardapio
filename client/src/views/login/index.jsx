@@ -12,7 +12,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/login', {
+      const response = await axios.post('http://192.168.0.68:3000/login', {
         login: nomeUsuario,
         senha: senha
       });

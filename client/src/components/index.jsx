@@ -39,7 +39,7 @@ function Navbar() {
           <div className={`nav-links ${menuOpen ? 'show' : ''}`}>
             {usuarioTipo === "a" && (
               <>
-                <button className="nav-btn" onClick={() => navigate("/cadastroU")}>Usuários</button>
+                <button className="nav-btn" onClick={() => navigate("/cadastroU")}>Cadastrar usuários</button>
                 <button className="nav-btn" onClick={() => navigate("/garcom/cardapio")}>Garçom</button>
                 <button className="nav-btn" onClick={() => navigate("/cozinha")}>Cozinha</button>
                 <button className="nav-btn" onClick={() => navigate("/cadastroi")}>Itens</button>
