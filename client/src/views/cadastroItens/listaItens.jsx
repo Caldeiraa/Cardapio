@@ -31,10 +31,7 @@ function SubCardapioList() {
     setAlterando(id);
     try {
       const rota = ativoAtual ? 'desativar' : 'ativar';
-      // Passando o id no corpo da requisição, conforme o backend espera
-      await axios.put(`${API_URL}/desativar/${rota}`, { id_sub_cardapio: id });
-      
-      // Atualizando a lista de itens no frontend após a alteração
+      await axios.put(`${API_URL}/${rota}`, { id_sub_cardapio: id });
       setItens(prev =>
         prev.map(item =>
           item.id_sup_cardapio === id ? { ...item, ativo: !ativoAtual } : item
