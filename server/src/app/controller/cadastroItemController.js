@@ -1,4 +1,4 @@
-const CadastroItem = require('../model/CadastroItem'); // ajuste o path se preciso
+const CadastroItem = require('../model/cadastroItem'); // ajuste o path se preciso
 
 class CadastroItemController {
   // Criar novo item
@@ -42,8 +42,9 @@ class CadastroItemController {
 
   // Ativar um item
   async ativar(req, res) {
+    let id_sub_cardapio = req.body.id_sub_cardapio
     try {
-      await CadastroItem.ativarItem(req.params.id);
+      await CadastroItem.ativarItem(id_sub_cardapio);
       res.json({ message: 'Item ativado com sucesso.' });
     } catch (error) {
       res.status(500).json({ error: 'Erro ao ativar item.' });
@@ -52,8 +53,9 @@ class CadastroItemController {
 
   // Desativar um item
   async desativar(req, res) {
+    let id_sub_cardapio = req.body.id_sub_cardapio
     try {
-      await CadastroItem.desativarItem(req.params.id);
+      await CadastroItem.desativarItem(id_sub_cardapio);
       res.json({ message: 'Item desativado com sucesso.' });
     } catch (error) {
       res.status(500).json({ error: 'Erro ao desativar item.' });

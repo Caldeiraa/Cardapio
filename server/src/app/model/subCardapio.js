@@ -9,7 +9,7 @@ class SubCardapio{
     }
     mostrar(id_cardapio) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM sub_cardapio WHERE cardapio_id = ${id_cardapio} ;`
+            let sql = `SELECT * FROM sub_cardapio WHERE cardapio_id = ${id_cardapio} AND ativo = true ;`
             
             this.conexao.query(sql, function(erro, resultado) {
                 if (erro) {

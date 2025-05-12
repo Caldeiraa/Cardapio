@@ -8,7 +8,7 @@ function SubCardapio() {
   useEffect(() => {
     async function fetchProdutos() {
       try {
-        const resposta = await fetch(`http://192.168.0.68:3000/subCategoria/${id_cardapio}`);
+        const resposta = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
         const dados = await resposta.json();
         setProdutos(dados);
       } catch (error) {
@@ -27,7 +27,7 @@ function SubCardapio() {
           <div className="col" key={produto.id_sup_cardapio}>
             <div className="card h-100">
               <img
-                src={`http://192.168.0.68:3000/img/${produto.imagem}`}
+                src={`http://localhost:3000/img/${produto.imagem}`}
                 className="card-img-top"
                 alt={produto.nome}
                 style={{ height: '200px', objectFit: 'cover' }}

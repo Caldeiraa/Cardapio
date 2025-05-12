@@ -32,7 +32,7 @@ class CadastroItem {
   // Listar todos os itens
   listarItens() {
     return new Promise((resolve, reject) => {
-      const sql = 'SELECT * FROM sub_cardapio';
+      const sql = 'SELECT * FROM sub_cardapio ';
       this.conexao.query(sql, (erro, resultado) => {
         if (erro) {
           reject([500, erro]);
@@ -44,10 +44,10 @@ class CadastroItem {
   }
 
   // Ativar item
-  ativarItem(id) {
+  ativarItem(id_sub_cardapio) {
     return new Promise((resolve, reject) => {
       const sql = 'UPDATE sub_cardapio SET ativo = true WHERE id_sup_cardapio = ?';
-      this.conexao.query(sql, [id], (erro, resultado) => {
+      this.conexao.query(sql, [id_sub_cardapio], (erro, resultado) => {
         if (erro) reject([500, erro]);
         else resolve([200, "Item ativado com sucesso"]);
       });
@@ -55,10 +55,10 @@ class CadastroItem {
   }
 
   // Desativar item
-  desativarItem(id) {
+  desativarItem(id_sub_cardapio) {
     return new Promise((resolve, reject) => {
       const sql = 'UPDATE sub_cardapio SET ativo = false WHERE id_sup_cardapio = ?';
-      this.conexao.query(sql, [id], (erro, resultado) => {
+      this.conexao.query(sql, [id_sub_cardapio], (erro, resultado) => {
         if (erro) reject([500, erro]);
         else resolve([200, "Item desativado com sucesso"]);
       });
