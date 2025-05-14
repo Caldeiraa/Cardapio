@@ -64,6 +64,17 @@ class CadastroItem {
       });
     });
   }
+  
+  atualizarItem(nome_item,descricao_item,preco_item,id_item) {
+    return new Promise((resolve, reject) => {
+      const sql = 'UPDATE sub_cardapio SET nome = ?, descricao_prod = ?, preco = ? WHERE id_sup_cardapio = 1;'
+      this.conexao.query(sql, [nome_item,descricao_item,preco_item,id_item], (erro, resultado) => {
+        if (erro) reject([500, erro]);
+        else resolve([200, "Item desativado com sucesso"]);
+      });
+    });
+  }
+
 }
 
 module.exports = new CadastroItem();

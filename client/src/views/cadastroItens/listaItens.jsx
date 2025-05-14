@@ -9,7 +9,7 @@ function SubCardapioList() {
   const [erro, setErro] = useState(null);
   const [alterando, setAlterando] = useState(null);
   const [modalItem, setModalItem] = useState(null);
-  const [formEdit, setFormEdit] = useState({ nome: '', descricao_prod: '', preco: '' });
+  const [formEdit, setFormEdit] = useState({ nome_item: '', descricao_item: '', preco_item: '' });
 
   const API_URL = 'http://localhost:3000';
 
@@ -47,9 +47,9 @@ function SubCardapioList() {
   const abrirModal = (item) => {
     setModalItem(item);
     setFormEdit({
-      nome: item.nome,
-      descricao_prod: item.descricao_prod,
-      preco: item.preco
+      nome_item: item.nome,
+      descricao_item: item.descricao_prod,
+      preco_item: item.preco
     });
     const modal = new bootstrap.Modal(document.getElementById('editModal'));
     modal.show();
@@ -57,18 +57,37 @@ function SubCardapioList() {
 
   async function salvarEdicao() {
     try {
-      await axios.put(`${API_URL}/subcardapio/${modalItem.id_sup_cardapio}`, formEdit);
+      // Preparando o payload conforme o backend espera
+      const dadosAtualizados = {
+        ...formEdit,
+        id_item: modalItem.id_sup_cardapio
+      };
+      
+      // Usando a rota específica do backend para atualização
+      await axios.put(`${API_URL}/atualizar/item`, dadosAtualizados);
+      
+      // Atualizando o estado local após sucesso
       setItens(prev =>
         prev.map(item =>
           item.id_sup_cardapio === modalItem.id_sup_cardapio
-            ? { ...item, ...formEdit }
+            ? { 
+                ...item, 
+                nome: formEdit.nome_item,
+                descricao_prod: formEdit.descricao_item,
+                preco: formEdit.preco_item
+              }
             : item
         )
       );
+      
       const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
       modal.hide();
+      
+      // Adicionando uma mensagem de sucesso
+      alert('Item atualizado com sucesso!');
     } catch (err) {
-      alert('Erro ao salvar alterações.');
+      console.error('Erro ao salvar alterações:', err);
+      alert('Erro ao salvar alterações. Verifique o console para mais detalhes.');
     }
   }
 
@@ -155,16 +174,16 @@ function SubCardapioList() {
                 <input
                   type="text"
                   className="form-control"
-                  value={formEdit.nome}
-                  onChange={e => setFormEdit({ ...formEdit, nome: e.target.value })}
+                  value={formEdit.nome_item}
+                  onChange={e => setFormEdit({ ...formEdit, nome_item: e.target.value })}
                 />
               </div>
               <div className="mb-3">
                 <label className="form-label">Descrição</label>
                 <textarea
                   className="form-control"
-                  value={formEdit.descricao_prod}
-                  onChange={e => setFormEdit({ ...formEdit, descricao_prod: e.target.value })}
+                  value={formEdit.descricao_item}
+                  onChange={e => setFormEdit({ ...formEdit, descricao_item: e.target.value })}
                 ></textarea>
               </div>
               <div className="mb-3">
@@ -173,8 +192,8 @@ function SubCardapioList() {
                   type="number"
                   className="form-control"
                   step="0.01"
-                  value={formEdit.preco}
-                  onChange={e => setFormEdit({ ...formEdit, preco: e.target.value })}
+                  value={formEdit.preco_item}
+                  onChange={e => setFormEdit({ ...formEdit, preco_item: e.target.value })}
                 />
               </div>
             </div>

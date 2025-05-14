@@ -61,6 +61,17 @@ class CadastroItemController {
       res.status(500).json({ error: 'Erro ao desativar item.' });
     }
   }
+
+  async atualizar(req, res) {
+    let {nome_item,descricao_item,preco_item,id_sub_cardapio} = req.body
+    try {
+      await CadastroItem.atualizarItem(nome_item,descricao_item,preco_item,id_sub_cardapio);
+      res.json({ message: 'Item desativado com sucesso.' });
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao desativar item.' });
+    }
+  }
+
 }
 
 module.exports = new CadastroItemController();

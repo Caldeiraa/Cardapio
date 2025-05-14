@@ -17,6 +17,7 @@ routes.put("/itens-pedido/:id_item/preparar", PedidoController.marcarComoPrepara
 routes.put('/usuarios/:id_usuario/desativar', Usuarios.desativar);
 routes.put('/ativar', CadastroItem.ativar);
 routes.put('/desativar', CadastroItem.desativar);
+routes.put("/atualizar/item",CadastroItem.atualizar)
 
 routes.post('/usuarioC', Usuarios.create);
 routes.post('/login', Usuarios.logar);
