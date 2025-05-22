@@ -37,7 +37,7 @@ function SubCardapioList() {
           item.id_sup_cardapio === id ? { ...item, ativo: !ativoAtual } : item
         )
       );
-    } catch (err) {
+    } catch {
       alert('Erro ao alterar o status do item.');
     } finally {
       setAlterando(null);
@@ -57,37 +57,37 @@ function SubCardapioList() {
 
   async function salvarEdicao() {
     try {
-      // Preparando o payload conforme o backend espera
       const dadosAtualizados = {
-        ...formEdit,
-        id_item: modalItem.id_sup_cardapio
+        nome_item: formEdit.nome_item,
+        descricao_item: formEdit.descricao_item,
+        preco_item: Number(formEdit.preco_item),
+        id_sub_cardapio: modalItem.id_sup_cardapio
       };
-      
-      // Usando a rota específica do backend para atualização
-      await axios.put(`${API_URL}/atualizar/item`, dadosAtualizados);
-      
-      // Atualizando o estado local após sucesso
-      setItens(prev =>
-        prev.map(item =>
-          item.id_sup_cardapio === modalItem.id_sup_cardapio
-            ? { 
-                ...item, 
-                nome: formEdit.nome_item,
-                descricao_prod: formEdit.descricao_item,
-                preco: formEdit.preco_item
-              }
-            : item
-        )
-      );
-      
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-      modal.hide();
-      
-      // Adicionando uma mensagem de sucesso
-      alert('Item atualizado com sucesso!');
+
+      const res = await axios.put(`${API_URL}/atualizar/item`, dadosAtualizados);
+
+      if (res.data.message.includes('sucesso')) {
+        setItens(prev =>
+          prev.map(item =>
+            item.id_sup_cardapio === modalItem.id_sup_cardapio
+              ? {
+                  ...item,
+                  nome: formEdit.nome_item,
+                  descricao_prod: formEdit.descricao_item,
+                  preco: formEdit.preco_item
+                }
+              : item
+          )
+        );
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+        modal.hide();
+        alert('Item atualizado com sucesso!');
+      } else {
+        alert('Erro: ' + res.data.message);
+      }
     } catch (err) {
-      console.error('Erro ao salvar alterações:', err);
-      alert('Erro ao salvar alterações. Verifique o console para mais detalhes.');
+      console.error(err);
+      alert('Erro ao salvar alterações.');
     }
   }
 
@@ -147,7 +147,7 @@ function SubCardapioList() {
                     </button>
                     <button
                       className="btn btn-sm text-white"
-                      style={{ backgroundColor: '#4da6ff', border: 'none' }}
+                      style={{ backgroundColor: '#4da6ff' }}
                       onClick={() => abrirModal(item)}
                     >
                       <FaEdit className="me-1" /> Editar
@@ -166,7 +166,7 @@ function SubCardapioList() {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Editar Item</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" />
             </div>
             <div className="modal-body">
               <div className="mb-3">
@@ -198,8 +198,8 @@ function SubCardapioList() {
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="button" className="btn btn-primary" onClick={salvarEdicao}>Salvar</button>
+              <button className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button className="btn btn-primary" onClick={salvarEdicao}>Salvar</button>
             </div>
           </div>
         </div>

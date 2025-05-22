@@ -54,7 +54,7 @@ CREATE TABLE itens_pedido (
 	FOREIGN KEY (pedido_id) REFERENCES pedido(id_pedido),
 	FOREIGN KEY (sub_cardapio_id) REFERENCES sub_cardapio(id_sup_cardapio)
 );
-
+select * from sub_cardapio;
 -- DADOS EXEMPLO
 INSERT INTO cardapio (nome_item, imagem_item) VALUES
 ('hamburguer', 'hamburguer.png'),
@@ -62,4 +62,4 @@ INSERT INTO cardapio (nome_item, imagem_item) VALUES
 ('Sorvete', 'hamburguer.png'),
 ('Bebidas', 'espetinho.png');
 
--- CONSULTA PARA A COZINHA VER PEDIDOS
+
