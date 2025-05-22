@@ -20,7 +20,7 @@ class CadastroItem {
           reject([400, erro]); // erro
         } else {
           // Movendo a imagem para o diretório correto
-          arquivo.mv(path.resolve(__dirname, '../Public/img', foto_item), (err) => {
+          arquivo.mv(path.resolve(__dirname, '../../../Public/img', foto_item), (err) => {
             if (err) reject([500, 'Erro ao mover o arquivo']);
           });
           resolve([201, "Item Inserido com sucesso"]);
