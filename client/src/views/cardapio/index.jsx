@@ -8,8 +8,8 @@ import './cardapio.css';
 
 function Cardapio() {
   const categorias = [
-    { id: 1, imagem: Lanche, nome: 'Lanche' },
-    { id: 2, imagem: Espetinho, nome: 'Espetinho' },
+    { id: 1, imagem: Lanche, nome: 'Lanches' },
+    { id: 2, imagem: Espetinho, nome: 'Espetinhos' },
     { id: 3, imagem: Sobremesas, nome: 'Sobremesas' },
     { id: 4, imagem: Bebidas, nome: 'Bebidas' },
   ];
@@ -17,14 +17,17 @@ function Cardapio() {
   return (
     <div className="container mt-4">
       <div className="text-center mb-4">
-        <h1>Cardápio - Botique</h1>
+        <h1 className="titulo-cardapio">Cardápio - Botique</h1>
       </div>
 
-      <div className="row">
+      <div className="row justify-content-center">
         {categorias.map((categoria) => (
-          <div key={categoria.id} className="col-12 col-sm-6 d-flex justify-content-center mb-4">
-            <Link to={`/sub_categoria/${categoria.id}`} className="text-decoration-none">
-              <img className="img-cardapio" src={categoria.imagem} alt={categoria.nome} />
+          <div key={categoria.id} className="col-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-center">
+            <Link to={`/sub_categoria/${categoria.id}`} className="card-cardapio text-decoration-none">
+              <div className="imagem-container">
+                <img src={categoria.imagem} alt={categoria.nome} className="img-fluid imagem-cardapio" />
+                <div className="overlay-nome">{categoria.nome}</div>
+              </div>
             </Link>
           </div>
         ))}
