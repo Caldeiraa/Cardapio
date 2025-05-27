@@ -16,16 +16,43 @@ class Pedido {
 
                 const pedido_id = resultado.insertId;
 
-                const itensQuery = "INSERT INTO itens_pedido (quantidade, preco, pedido_id, sub_cardapio_id) VALUES ?";
-                const valores = itens.map(item => [item.quantidade, item.preco, pedido_id, item.sub_cardapio_id]);
+                // Agora vamos buscar o preço atual de cada item para garantir que o preço gravado seja o correto
+                const valores = [];
+                let count = 0;
+                let erroEncontrado = false;
 
-                this.conexao.query(itensQuery, [valores], (erro2, resultado2) => {
-                    if (erro2) return reject([500, erro2]);
-                    resolve([201, { id_pedido: pedido_id, mensagem: "Pedido realizado com sucesso!" }]);
+                itens.forEach(item => {
+                    const sqlPreco = "SELECT preco FROM sub_cardapio WHERE id_sup_cardapio = ?";
+                    this.conexao.query(sqlPreco, [item.sub_cardapio_id], (erroPreco, resultadoPreco) => {
+                        if (erroPreco) {
+                            if (!erroEncontrado) {
+                                erroEncontrado = true;
+                                return reject([500, erroPreco]);
+                            }
+                        } else if (resultadoPreco.length === 0) {
+                            if (!erroEncontrado) {
+                                erroEncontrado = true;
+                                return reject([400, `Produto não encontrado: id ${item.sub_cardapio_id}`]);
+                            }
+                        } else {
+                            const precoAtual = resultadoPreco[0].preco;
+                            valores.push([item.quantidade, precoAtual, pedido_id, item.sub_cardapio_id]);
+                        }
+
+                        count++;
+                        if (count === itens.length && !erroEncontrado) {
+                            const itensQuery = "INSERT INTO itens_pedido (quantidade, preco, pedido_id, sub_cardapio_id) VALUES ?";
+                            this.conexao.query(itensQuery, [valores], (erro2, resultado2) => {
+                                if (erro2) return reject([500, erro2]);
+                                resolve([201, { id_pedido: pedido_id, mensagem: "Pedido realizado com sucesso!" }]);
+                            });
+                        }
+                    });
                 });
             });
         });
     }
+
 
     listarPedidosComItens() {
         return new Promise((resolve, reject) => {
@@ -69,36 +96,35 @@ class Pedido {
         });
     }
 
-    buscarPedidosPorDataHora(inicio, fim) {
-        return new Promise((resolve, reject) => {
-            const sql = `
-                SELECT 
-                    p.id_pedido,
-                    p.nome_cliente,
-                    p.mesa,
-                    p.data_hora,
-                    p.total AS total_pedido,
-                    sc.nome AS item,
-                    ip.quantidade,
-                    (ip.quantidade * sc.preco) AS total_item
-                FROM pedido p
-                JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
-                JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
-                WHERE p.data_hora BETWEEN ? AND ?
-                  AND p.status = 'preparado'
-                ORDER BY p.data_hora ASC, p.id_pedido, sc.nome
-            `;
-    
-            this.conexao.query(sql, [inicio, fim], (erro, resultado) => {
-                if (erro) reject([500, erro]);
-                else resolve([200, resultado]);
-            });
+   buscarPedidosPorDataHora(inicio, fim) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT 
+                p.id_pedido,
+                p.nome_cliente,
+                p.data_hora,
+                sc.nome AS item,
+                ip.quantidade,
+                (ip.quantidade * ip.preco) AS total_item
+            FROM pedido p
+            JOIN itens_pedido ip ON p.id_pedido = ip.pedido_id
+            JOIN sub_cardapio sc ON ip.sub_cardapio_id = sc.id_sup_cardapio
+            WHERE p.data_hora BETWEEN ? AND ?
+              AND p.status = 'preparado'
+            ORDER BY p.data_hora ASC, p.id_pedido, sc.nome
+        `;
+
+        this.conexao.query(sql, [inicio, fim], (erro, resultado) => {
+            if (erro) reject([500, erro]);
+            else resolve([200, resultado]);
         });
-        
-    }
-    
-    
-    
+    });
+}
+
+
+
+
+
 }
 
 module.exports = new Pedido();

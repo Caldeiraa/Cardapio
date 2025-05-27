@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 const formatDate = (date) => {
   const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:00`;
 };
 
 function FechamentoCaixa() {
@@ -41,17 +41,20 @@ function FechamentoCaixa() {
           fim: formatDate(dataFim)
         }
       });
-
       if (response.data.length === 0) {
         setError('Nenhum pedido encontrado.');
+        setPedidos([]);
+        setTotalFinal(0);
       } else {
         setPedidos(response.data);
-        const total = response.data.reduce((acc, pedido) => acc + pedido.total_item, 0);
+        const total = response.data.reduce((acc, pedido) => acc + Number(pedido.total_item), 0);
         setTotalFinal(total);
       }
     } catch (err) {
       console.error(err);
       setError('Erro ao buscar pedidos.');
+      setPedidos([]);
+      setTotalFinal(0);
     } finally {
       setLoading(false);
     }
@@ -59,23 +62,82 @@ function FechamentoCaixa() {
 
   const exportToExcel = () => {
     if (pedidos.length === 0) return alert("Nenhum dado para exportar.");
+
+    // Montar os dados da planilha
     const wsData = [
-      ["ID Pedido", "Cliente", "Mesa", "Data/Hora", "Item", "Qtd", "Total (R$)"],
+      ["Numero do pedido", "Cliente", "Data/Hora", "Item", "Qtd", "Total (R$)"],
       ...pedidos.map(p => [
         p.id_pedido,
         p.nome_cliente,
-        p.mesa,
         new Date(p.data_hora).toLocaleString(),
         p.item,
         p.quantidade,
-        Number(p.total_item).toFixed(2)
+        Number(p.total_item)
       ]),
-      ["", "", "", "", "", "Total Geral", totalFinal.toFixed(2)]
+      ["", "", "", "", "Total Geral", Number(totalFinal)]
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Definir estilos básicos
+    const headerRange = XLSX.utils.decode_range(ws['!ref']);
+    for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+      const cellAddress = XLSX.utils.encode_cell({r:0, c:C});
+      if(!ws[cellAddress]) continue;
+      ws[cellAddress].s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "0070C0" } },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin", color: { rgb: "000000" } },
+          bottom: { style: "thin", color: { rgb: "000000" } },
+          left: { style: "thin", color: { rgb: "000000" } },
+          right: { style: "thin", color: { rgb: "000000" } },
+        }
+      };
+    }
+
+    // Estilo para total (última linha)
+    const lastRow = headerRange.e.r;
+    for(let C = headerRange.s.c; C <= headerRange.e.c; ++C){
+      const cellAddress = XLSX.utils.encode_cell({r:lastRow, c:C});
+      if(!ws[cellAddress]) continue;
+      ws[cellAddress].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "D9E1F2" } },
+        border: {
+          top: { style: "thin", color: { rgb: "000000" } },
+          bottom: { style: "thin", color: { rgb: "000000" } },
+          left: { style: "thin", color: { rgb: "000000" } },
+          right: { style: "thin", color: { rgb: "000000" } },
+        },
+        alignment: { horizontal: C === 5 ? "right" : "center" }
+      };
+    }
+
+    // Alinhar colunas (Qtd e Total)
+    for (let R = 1; R < lastRow; R++) {
+      // Quantidade (col 4)
+      let cellQtd = XLSX.utils.encode_cell({r:R, c:4});
+      if(ws[cellQtd]) ws[cellQtd].s = { alignment: { horizontal: "center" } };
+      // Total (col 5)
+      let cellTotal = XLSX.utils.encode_cell({r:R, c:5});
+      if(ws[cellTotal]) ws[cellTotal].s = { alignment: "right", numFmt: 'R$ #,##0.00' };
+    }
+
+    // Ajustar largura das colunas
+    ws['!cols'] = [
+      { wch: 10 }, // ID Pedido
+      { wch: 20 }, // Cliente
+      { wch: 20 }, // Data/Hora
+      { wch: 25 }, // Item
+      { wch: 6 },  // Qtd
+      { wch: 12 }, // Total (R$)
+    ];
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Fechamento");
+
     XLSX.writeFile(wb, "fechamento_caixa.xlsx");
   };
 
@@ -122,8 +184,9 @@ function FechamentoCaixa() {
           <thead className="table-dark">
             <tr>
               <th>Cliente</th>
-              <th>Mesa</th>
               <th>Data/Hora</th>
+              <th>Item</th>
+              <th>Qtd</th>
               <th>Total (R$)</th>
             </tr>
           </thead>
@@ -132,14 +195,15 @@ function FechamentoCaixa() {
               pedidos.map((pedido, index) => (
                 <tr key={index}>
                   <td>{pedido.nome_cliente}</td>
-                  <td>{pedido.mesa}</td>
                   <td>{new Date(pedido.data_hora).toLocaleString()}</td>
+                  <td>{pedido.item}</td>
+                  <td>{pedido.quantidade}</td>
                   <td>R$ {Number(pedido.total_item).toFixed(2)}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center">Nenhum pedido exibido</td>
+                <td colSpan="5" className="text-center">Nenhum pedido exibido</td>
               </tr>
             )}
           </tbody>
@@ -148,7 +212,7 @@ function FechamentoCaixa() {
 
       {pedidos.length > 0 && (
         <div className="text-end mt-3 fw-bold">
-          Total Final: <span className="text-success">R$ {totalFinal.toFixed(2)}</span>
+          Total Final: <span className="text-success">R$ {Number(totalFinal).toFixed(2)}</span>
         </div>
       )}
     </div>
