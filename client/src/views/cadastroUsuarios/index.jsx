@@ -7,7 +7,7 @@ import './CadastroU.css'
 function Index() {
   const navigate = useNavigate();
 
-  useEffect(() => {
+ useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");

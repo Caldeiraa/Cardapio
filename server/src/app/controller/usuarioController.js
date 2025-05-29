@@ -6,7 +6,7 @@ class UsuarioController {
     async create(req, res) {
         const usuarios = await CadastroUsuario.listarUsuarios();
 
-        if (usuarios[1].length > 0) {
+        /*if (usuarios[1].length > 0) {
             const token = req.headers['x-access-token'];
             if (!token) return res.status(401).json("Token não fornecido");
 
@@ -18,7 +18,7 @@ class UsuarioController {
             } catch (err) {
                 return res.status(401).json("Token inválido");
             }
-        }
+        }*/
 
         // Se for o primeiro cadastro ou admin logado, continua
         let { nome_usuario, tipo_usuario, login, senha } = req.body;
