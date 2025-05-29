@@ -8,20 +8,34 @@ function SubCardapio() {
   useEffect(() => {
     async function fetchProdutos() {
       try {
+        console.log("ID do cardápio recebido:", id_cardapio);
+
         const resposta = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
         const dados = await resposta.json();
-        setProdutos(dados);
+
+        console.log("Resposta da API:", dados);
+
+        // Garante que dados seja um array antes de setar
+        if (Array.isArray(dados)) {
+          setProdutos(dados);
+        } else {
+          setProdutos([]);
+          console.warn("Resposta não é um array. Verifique o formato da resposta.");
+        }
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
+        setProdutos([]);
       }
     }
 
-    fetchProdutos();
+    if (id_cardapio) {
+      fetchProdutos();
+    }
   }, [id_cardapio]);
 
   return (
     <div className="container my-5">
-      <h1 className="text-center mb-4">Cardápio</h1>
+      <h1 className="text-center mb-4">Produtos da Categoria</h1>
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
         {produtos.map((produto) => (
           <div className="col" key={produto.id_sup_cardapio}>

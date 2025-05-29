@@ -46,6 +46,7 @@ function Navbar() {
                 <button className="nav-btn" onClick={() => navigate("/fechamento")}>Fechamento</button>
                 <button className="nav-btn" onClick={() => navigate("/lista/usuarios")}>Lista de Funcionarios</button>
                 <button className="nav-btn" onClick={() => navigate("/lista/itens")}>Lista de Itens</button>
+                <button className="nav-btn" onClick={() => navigate("/cadastro/cardapio")}>Cardapio</button>
 
               </>
             )}

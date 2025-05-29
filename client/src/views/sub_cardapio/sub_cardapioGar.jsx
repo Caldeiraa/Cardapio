@@ -28,9 +28,13 @@ function SubCardapioGarcom() {
     }
 
     async function fetchProdutos() {
-      const res = await fetch(`http://192.168.0.68:3000/subCategoria/${id_cardapio}`);
-      const data = await res.json();
-      setProdutos(data);
+      try {
+        const res = await fetch(`http://localhost:3000/subCategoria/${id_cardapio}`);
+        const data = await res.json();
+        setProdutos(data);
+      } catch (err) {
+        console.error("Erro ao buscar subcategoria:", err);
+      }
     }
 
     const pedidoSalvo = JSON.parse(localStorage.getItem("pedido_em_progresso"));
@@ -70,7 +74,7 @@ function SubCardapioGarcom() {
       return;
     }
 
-    const res = await fetch("http://192.168.0.68:3000/pedido", {
+    const res = await fetch("http://localhost:3000/pedido", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(pedido)
@@ -106,7 +110,7 @@ function SubCardapioGarcom() {
               <div className="col" key={p.id_sup_cardapio}>
                 <div className="card h-100">
                   <img
-                    src={`http://192.168.0.68:3000/img/${p.imagem}`}
+                    src={`http://localhost:3000/img/${p.imagem}`}
                     className="card-img-top"
                     alt={p.nome}
                     style={{ height: '200px', objectFit: 'cover' }}
