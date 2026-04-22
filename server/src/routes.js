@@ -6,13 +6,18 @@ const Usuarios = require('../src/app/controller/usuarioController');
 const PedidoController = require("../src/app/controller/pedidosController");
 const CadastroItem = require("../src/app/controller/cadastroItemController");
 const CadastroCardapio = require("../src/app/controller/cadastroCategoriaController")
+const Estoque = require("../src/app/controller/estoqueController");
+const estoque = require('./app/model/estoque');
 
+routes.get('/estoque',Estoque.listar)
+routes.get('/estoque/baixo', Estoque.verificarBaixo)
 routes.get('/subCategoria/:id_cardapio', SubCardapio.index);
 routes.get("/pedidos", PedidoController.listar);
 routes.get("/fechamento-caixa", PedidoController.buscarPorDataHora);
 routes.get('/usuarios', Usuarios.listar);
 routes.get('/subcardapio',CadastroItem.listar)
 routes.get('/cardapio',CadastroCardapio.listar)  
+
 
 routes.put("/pedidos/:id/preparar", PedidoController.atualizarStatus);
 routes.put("/itens-pedido/:id_item/preparar", PedidoController.marcarComoPreparado);
@@ -21,6 +26,7 @@ routes.put('/ativar', CadastroItem.ativar);
 routes.put('/desativar', CadastroItem.desativar);
 routes.put("/atualizar/item",CadastroItem.atualizar)
 
+routes.post('/estoque',Estoque.inserir)
 routes.post('/usuarioC', Usuarios.create);
 routes.post('/login', Usuarios.logar);
 routes.post("/pedido", PedidoController.criar);

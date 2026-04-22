@@ -16,6 +16,9 @@ import ListaItens from './views/cadastroItens/listaItens'
 import CastroCardapio from './views/cardapio/cadastro'
 import './App.css';
 import CadastroCardapio from './views/cardapio/cadastro';
+import Estoque from './views/estoque/index'
+import Receita from './views/receitas/index'
+import ListaReceita from './views/receitas/lista'
 
 function App() {
   return (
@@ -23,7 +26,10 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Cardapio />} />
-        <Route path="/cadastro/cardapio" element={<CadastroCardapio/>} /> 
+        <Route path="/receitas" element={<Receita />} />
+        <Route path="/listareceitas" element={<ListaReceita />} />
+        <Route path="/estoque" element={<Estoque />} />
+        <Route path="/cadastro/cardapio" element={<CadastroCardapio />} />
         <Route path="/garcom/cardapio" element={<CardapioG />} />
         <Route path="/sub_categoria/:id_cardapio" element={<SubCardapio />} />
         <Route path="/cozinha" element={<Cozinha />} />
