@@ -1,5 +1,5 @@
 -- CRIAÇÃO DO BANCO
-DROP DATABASE IF EXISTS lanchonete;
+DROP DATABASE IF EXISTS lanchonetes;
 CREATE DATABASE lanchonetes;
 USE lanchonetes;
 
@@ -9,6 +9,7 @@ CREATE TABLE cardapio (
 	nome_item VARCHAR(50),
 	imagem_item VARCHAR(100)
 );
+TRUNCATE TABLE cardapio;
 
 -- SUB-ITENS DO CARDÁPIO
 CREATE TABLE sub_cardapio (
@@ -21,6 +22,7 @@ CREATE TABLE sub_cardapio (
     ativo BOOLEAN NOT NULL DEFAULT true,
 	FOREIGN KEY (cardapio_id) REFERENCES cardapio(id_cardapio)
 );
+select * from sub_cardapio where cardapio_id =2;
 
 CREATE TABLE usuario (
 	id_usuario INT PRIMARY KEY AUTO_INCREMENT,
@@ -30,8 +32,7 @@ CREATE TABLE usuario (
 	login VARCHAR(25) NOT NULL, 
 	senha VARCHAR(100) NOT NULL
 );
-select * from usuario;
-
+select * from receita;
 
 -- TABELA DE PEDIDOS (com total agora)
 CREATE TABLE pedido (
@@ -55,11 +56,27 @@ CREATE TABLE itens_pedido (
 	FOREIGN KEY (sub_cardapio_id) REFERENCES sub_cardapio(id_sup_cardapio)
 );
 select * from sub_cardapio;
--- DADOS EXEMPLO
-INSERT INTO cardapio (nome_item, imagem_item) VALUES
-('hamburguer', 'hamburguer.png'),
-('espetinho', 'espetinho.png'),
-('Sorvete', 'hamburguer.png'),
-('Bebidas', 'espetinho.png');
+
+
+-- INGREDIENTES (estoque)
+CREATE TABLE ingredientes (
+	id_ingrediente INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(50),
+	unidade VARCHAR(10), -- kg, g, unidade
+	quantidade DECIMAL(10,2),
+	minimo DECIMAL(10,2)
+);
+
+-- RECEITA (ligação produto -> ingrediente)
+CREATE TABLE receita (
+	id_receita INT PRIMARY KEY AUTO_INCREMENT,
+	sub_cardapio_id INT,
+	ingrediente_id INT,
+	quantidade DECIMAL(10,2),
+	FOREIGN KEY (sub_cardapio_id) REFERENCES sub_cardapio(id_sup_cardapio),
+	FOREIGN KEY (ingrediente_id) REFERENCES ingredientes(id_ingrediente)
+);
+
+
 
 

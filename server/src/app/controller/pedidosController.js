@@ -1,5 +1,5 @@
 const Pedido = require("../model/pedidos");
-
+const Estoque = require("../model/estoque"); 
 class PedidoController {
     criar(req, res) {
         const pedido = req.body;
@@ -27,8 +27,27 @@ class PedidoController {
         const { id } = req.params;
 
         Pedido.atualizarStatus(id)
-            .then(resposta => res.status(resposta[0]).json(resposta[1]))
-            .catch(erro => res.status(erro[0]).json("Erro: " + erro[1].errno));
+            .then(respostaPedido => {
+                // O status do pedido mudou para 'preparado' com sucesso!
+                // 🔥 Agora disparamos a baixa automática de todos os itens desse pedido no estoque
+                return Estoque.baixarEstoque(id)
+                    .then(respostaEstoque => {
+                        // Se deu tudo certo, responde ao frontend
+                        res.status(200).json({ 
+                            mensagem: "Pedido pronto e estoque atualizado com sucesso!" 
+                        });
+                    });
+            })
+            .catch(erro => {
+                console.error("Erro ao preparar pedido ou baixar estoque:", erro);
+                
+                // Tratamento de erro seguindo o padrão do seu projeto (Array [status, erro])
+                if (Array.isArray(erro)) {
+                    res.status(erro[0]).json("Erro: " + (erro[1].sqlMessage || erro[1]));
+                } else {
+                    res.status(500).json("Erro interno no servidor.");
+                }
+            });
     }
     marcarComoPreparado(req, res) {
         const id_item = req.params.id_item;

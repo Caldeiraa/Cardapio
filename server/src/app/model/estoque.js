@@ -16,6 +16,23 @@ class Estoque {
         });
     }
 
+    listarReceita() {
+        return new Promise((resolve, reject) => {
+            const sql = `SELECT 
+    p.nome AS produto,
+    i.nome AS ingrediente,
+    r.quantidade,
+    i.unidade
+FROM receita r
+JOIN sub_cardapio p ON r.sub_cardapio_id = p.id_sup_cardapio
+JOIN ingredientes i ON r.ingrediente_id = i.id_ingrediente;`
+            this.conexao.query(sql, (erro, resultado) => {
+                if (erro) reject([500, erro]);
+                else resolve([200, resultado]);
+            });
+        });
+    }
+
     inserirIngrediente(nome, unidade, quantidade, minimo) {
         return new Promise((resolve, reject) => {
             const sql = `
@@ -92,6 +109,46 @@ class Estoque {
                 if (erro) reject([500, erro]);
                 else resolve([200, resultado]);
             });
+        });
+    }
+
+    buscarProdId(id_categoria) {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT * FROM sub_cardapio 
+                WHERE cardapio_id = ?
+            `;
+
+            this.conexao.query(sql, [id_categoria], (erro, resultado) => {
+                if (erro) reject([500, erro]);
+                else resolve([200, resultado]);
+            });
+        });
+    }
+
+    // NOVO: Método para ligar o Produto ao Ingrediente (cadastrar a Receita)
+    // 🔥 NOVO: Método que salva vários ingredientes de uma vez
+    inserirReceitaEmLote(sub_cardapio_id, listaIngredientes) {
+        return new Promise((resolve, reject) => {
+            
+            // Cria uma array de Promises para cada insert no banco
+            let promessas = listaIngredientes.map(item => {
+                return new Promise((res, rej) => {
+                    const sql = `
+                        INSERT INTO receita (sub_cardapio_id, ingrediente_id, quantidade)
+                        VALUES (?, ?, ?)
+                    `;
+                    this.conexao.query(sql, [sub_cardapio_id, item.ingrediente_id, item.quantidade], (erro) => {
+                        if (erro) rej(erro);
+                        else res();
+                    });
+                });
+            });
+
+            // Executa todas as inserções
+            Promise.all(promessas)
+                .then(() => resolve([201, { mensagem: "Receita completa salva com sucesso!" }]))
+                .catch((erro) => reject([500, { erro: "Falha ao gravar receita", detalhes: erro }]));
         });
     }
 }

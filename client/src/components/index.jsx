@@ -63,12 +63,17 @@ function Navbar() {
           <button onClick={() => navigate("/cadastroU")}>Usuários</button>
           <button onClick={() => navigate("/cadastroi")}>Itens</button>
           <button onClick={() => navigate("/cadastro/cardapio")}>Cardápio</button>
+          <button onClick={() => navigate("/receitas")}>Receita</button>
+          <button onClick={() => navigate("/estoque")}>Estoque</button>
+
         </div>
 
         <div className="menu-group">
           <p>Listagens</p>
           <button onClick={() => navigate("/lista/usuarios")}>Funcionários</button>
           <button onClick={() => navigate("/lista/itens")}>Itens</button>
+          <button onClick={() => navigate("/listareceitas")}>Receitas</button>
+
         </div>
       </div>
 

@@ -1,6 +1,6 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode'; // Corrigido o nome da função
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 
 function Index() {
@@ -9,31 +9,38 @@ function Index() {
     preco: '',
     imagem: null,
     descricao_prod: '',
-    cardapio_id: '1',
+    cardapio_id: '',
   });
+
+  const [categorias, setCategorias] = useState([]); // 🔥 NOVO
   const navigate = useNavigate();
   const [mensagem, setMensagem] = useState('');
   const [imagemPreview, setImagemPreview] = useState('');
 
-   useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-  
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded.usuario_tipo !== "a") {
-          navigate("/login"); // Se não for da cozinha, redireciona para login
-          return;
-        }
-      } catch (error) {
-        navigate("/login");
-        return;
-      }
-    }, [navigate]);
-  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.usuario_tipo !== "a") return navigate("/login");
+    } catch {
+      return navigate("/login");
+    }
+
+    carregarCategorias(); // 🔥 NOVO
+  }, [navigate]);
+
+  // 🔥 BUSCAR DO BACKEND
+  const carregarCategorias = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/cardapio");
+      setCategorias(res.data);
+    } catch (error) {
+      console.error("Erro ao carregar categorias", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -67,14 +74,17 @@ function Index() {
       await axios.post('http://localhost:3000/cadastroI', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+
       setMensagem('Item cadastrado com sucesso!');
+
       setFormData({
         nome: '',
         preco: '',
         imagem: null,
         descricao_prod: '',
-        cardapio_id: '1',
+        cardapio_id: '',
       });
+
       setImagemPreview('');
     } catch (error) {
       console.error('Erro ao cadastrar item:', error);
@@ -95,7 +105,7 @@ function Index() {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label className="form-label">Nome do Item</label>
+                <label>Nome do Item</label>
                 <input
                   type="text"
                   name="nome"
@@ -107,7 +117,7 @@ function Index() {
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Preço</label>
+                <label>Preço</label>
                 <input
                   type="number"
                   step="0.01"
@@ -120,10 +130,9 @@ function Index() {
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Imagem</label>
+                <label>Imagem</label>
                 <input
                   type="file"
-                  name="imagem"
                   className="form-control"
                   accept="image/*"
                   onChange={handleImageChange}
@@ -135,25 +144,26 @@ function Index() {
                 <div className="text-center mb-3">
                   <img
                     src={imagemPreview}
-                    alt="Pré-visualização"
-                    style={{ maxWidth: '200px', maxHeight: '200px' }}
+                    alt="preview"
+                    style={{ maxWidth: '200px' }}
                   />
                 </div>
               )}
 
               <div className="mb-3">
-                <label className="form-label">Descrição</label>
+                <label>Descrição</label>
                 <textarea
                   name="descricao_prod"
                   className="form-control"
                   value={formData.descricao_prod}
                   onChange={handleChange}
                   required
-                ></textarea>
+                />
               </div>
 
+              {/* 🔥 SELECT DINÂMICO */}
               <div className="mb-4">
-                <label className="form-label">Categoria</label>
+                <label>Categoria</label>
                 <select
                   name="cardapio_id"
                   className="form-select"
@@ -161,18 +171,19 @@ function Index() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="1">Hambúrguer</option>
-                  <option value="2">Espetinhos</option>
-                  <option value="3">Sobremesas</option>
-                  <option value="4">Bebidas</option>
+                  <option value="">Selecione</option>
+
+                  {categorias.map((cat) => (
+                    <option key={cat.id_cardapio} value={cat.id_cardapio}>
+                      {cat.nome_item}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              <div className="d-grid">
-                <button type="submit" className="btn btn-success">
-                  Cadastrar Item
-                </button>
-              </div>
+              <button className="btn btn-success w-100">
+                Cadastrar Item
+              </button>
             </form>
           </div>
         </div>
