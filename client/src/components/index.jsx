@@ -55,6 +55,7 @@ function Navbar() {
           <p>Operação</p>
           <button onClick={() => navigate("/garcom/cardapio")}>Garçom</button>
           <button onClick={() => navigate("/cozinha")}>Cozinha</button>
+          <button onClick={() => navigate("/comanda")}>Fechar Comanda</button>
           <button onClick={() => navigate("/fechamento")}>Fechamento</button>
         </div>
 

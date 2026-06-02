@@ -68,6 +68,26 @@ function SubCardapioGarcom() {
     localStorage.setItem("pedido_em_progresso", JSON.stringify(novoPedido));
   };
 
+  const alterarObservacao = (id, obs) => {
+    const novaLista = [...pedido.itens];
+    const index = novaLista.findIndex(item => item.sub_cardapio_id === id);
+
+    if (index >= 0) {
+      novaLista[index].observacao = obs;
+      const novoPedido = { ...pedido, itens: novaLista };
+      setPedido(novoPedido);
+      localStorage.setItem("pedido_em_progresso", JSON.stringify(novoPedido));
+    }
+  };
+
+  const removerItem = (id) => {
+    const novaLista = pedido.itens.filter(item => item.sub_cardapio_id !== id);
+    const novoTotal = novaLista.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+    const novoPedido = { ...pedido, itens: novaLista, total: novoTotal };
+    setPedido(novoPedido);
+    localStorage.setItem("pedido_em_progresso", JSON.stringify(novoPedido));
+  };
+
   const enviarPedido = async () => {
     if (!pedido.nome_cliente || !pedido.mesa || pedido.itens.length === 0) {
       alert("Complete os dados do pedido!");
@@ -132,7 +152,13 @@ function SubCardapioGarcom() {
         </div>
       </div>
 
-      <CarrinhoFlutuante pedido={pedido} alterarQuantidade={alterarQuantidade} enviarPedido={enviarPedido} />
+      <CarrinhoFlutuante 
+        pedido={pedido} 
+        alterarQuantidade={alterarQuantidade} 
+        alterarObservacao={alterarObservacao}
+        removerItem={removerItem}
+        enviarPedido={enviarPedido} 
+      />
     </>
   );
 }

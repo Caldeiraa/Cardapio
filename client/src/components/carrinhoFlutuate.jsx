@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaMinus, FaPlus, FaTrash, FaShoppingCart, FaTimes } from 'react-icons/fa';
 
-function CarrinhoFlutuante({ pedido, alterarQuantidade, removerItem, enviarPedido }) {
+function CarrinhoFlutuante({ pedido, alterarQuantidade, alterarObservacao, removerItem, enviarPedido }) {
   const [aberto, setAberto] = useState(false);
 
   if (!pedido || pedido.itens.length === 0) {
@@ -51,7 +51,7 @@ function CarrinhoFlutuante({ pedido, alterarQuantidade, removerItem, enviarPedid
           padding: '15px',
           zIndex: 1000,
           boxShadow: '0 -2px 10px rgba(0,0,0,0.2)',
-          maxHeight: '50vh',
+          maxHeight: '70vh',
           overflowY: 'auto'
         }}>
           <div className="d-flex justify-content-between align-items-center mb-2">
@@ -62,21 +62,32 @@ function CarrinhoFlutuante({ pedido, alterarQuantidade, removerItem, enviarPedid
           </div>
 
           {pedido.itens.map((item) => (
-            <div key={item.sub_cardapio_id} className="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-              <div>
-                <strong>{item.nome}</strong><br />
-                <small>Quantidade: {item.quantidade}</small>
+            <div key={item.sub_cardapio_id} className="mb-3 border-bottom pb-2">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{item.nome}</strong><br />
+                  <small>Quantidade: {item.quantidade}</small>
+                </div>
+                <div className="d-flex align-items-center">
+                  <button className="btn btn-sm btn-outline-danger me-1" onClick={() => alterarQuantidade(item.sub_cardapio_id, -1)}>
+                    <FaMinus />
+                  </button>
+                  <button className="btn btn-sm btn-outline-success me-1" onClick={() => alterarQuantidade(item.sub_cardapio_id, 1)}>
+                    <FaPlus />
+                  </button>
+                  <button className="btn btn-sm btn-outline-dark" onClick={() => removerItem(item.sub_cardapio_id)}>
+                    <FaTrash />
+                  </button>
+                </div>
               </div>
-              <div className="d-flex align-items-center">
-                <button className="btn btn-sm btn-outline-danger me-1" onClick={() => alterarQuantidade(item.sub_cardapio_id, -1)}>
-                  <FaMinus />
-                </button>
-                <button className="btn btn-sm btn-outline-success me-1" onClick={() => alterarQuantidade(item.sub_cardapio_id, 1)}>
-                  <FaPlus />
-                </button>
-                <button className="btn btn-sm btn-outline-dark" onClick={() => removerItem(item.sub_cardapio_id)}>
-                  <FaTrash />
-                </button>
+              <div className="mt-2">
+                <input 
+                  type="text" 
+                  className="form-control form-control-sm" 
+                  placeholder="Observação (ex: sem cebola)" 
+                  value={item.observacao || ''} 
+                  onChange={(e) => alterarObservacao(item.sub_cardapio_id, e.target.value)}
+                />
               </div>
             </div>
           ))}

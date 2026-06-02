@@ -6,7 +6,7 @@ const app = express();
 
 // MIDDLEWARES
 app.use(cors());
-app.use(fileUpload()); // <===== IMPORTANTE!!!
+app.use(fileUpload());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

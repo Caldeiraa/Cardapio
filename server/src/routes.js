@@ -12,6 +12,8 @@ routes.get('/estoque',Estoque.listar)
 routes.get('/estoque/baixo', Estoque.verificarBaixo)
 routes.get('/subCategoria/:id_cardapio', SubCardapio.index);
 routes.get("/pedidos", PedidoController.listar);
+routes.get("/pedidos/mesas", PedidoController.listarMesasAtivas);
+routes.get("/pedidos/mesa/:mesa", PedidoController.buscarPorMesa);
 routes.get("/fechamento-caixa", PedidoController.buscarPorDataHora);
 routes.get('/usuarios', Usuarios.listar);
 routes.get('/subcardapio',CadastroItem.listar)
@@ -21,6 +23,7 @@ routes.get('/receita',Estoque.listarRe)
 
 routes.put("/pedidos/:id/preparar", PedidoController.atualizarStatus);
 routes.put("/itens-pedido/:id_item/preparar", PedidoController.marcarComoPreparado);
+routes.put("/pedidos/pagar/:mesa", PedidoController.fecharComanda);
 routes.put('/usuarios/:id_usuario/desativar', Usuarios.desativar);
 routes.put('/ativar', CadastroItem.ativar);
 routes.put('/desativar', CadastroItem.desativar);

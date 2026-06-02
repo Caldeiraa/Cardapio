@@ -77,9 +77,26 @@ class PedidoController {
                 res.status(erro[0]).json("Erro: " + erro[1].errno);
             });
     }
-    
-    
 
+    listarMesasAtivas(req, res) {
+        Pedido.listarMesasAtivas()
+            .then(resposta => res.status(resposta[0]).json(resposta[1]))
+            .catch(erro => res.status(erro[0]).json(erro[1]));
+    }
+
+    buscarPorMesa(req, res) {
+        const { mesa } = req.params;
+        Pedido.buscarPorMesa(mesa)
+            .then(resposta => res.status(resposta[0]).json(resposta[1]))
+            .catch(erro => res.status(erro[0]).json(erro[1]));
+    }
+
+    fecharComanda(req, res) {
+        const { mesa } = req.params;
+        Pedido.pagarMesa(mesa)
+            .then(resposta => res.status(resposta[0]).json(resposta[1]))
+            .catch(erro => res.status(erro[0]).json(erro[1]));
+    }
 }
 
 module.exports = new PedidoController();

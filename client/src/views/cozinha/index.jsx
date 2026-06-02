@@ -77,6 +77,7 @@ function Index() {
                 <th>Mesa</th>
                 <th>Data/Hora</th>
                 <th>Item</th>
+                <th>Observação</th>
                 <th>Qtd</th>
                 <th>Ação</th>
               </tr>
@@ -88,6 +89,7 @@ function Index() {
                   <td>{pedido.mesa}</td>
                   <td>{new Date(pedido.data_hora).toLocaleString()}</td>
                   <td>{pedido.item}</td>
+                  <td style={{ color: 'red', fontWeight: 'bold' }}>{pedido.observacao}</td>
                   <td>{pedido.quantidade}</td>
                   <td>
                     {pedido.preparado ? (
@@ -105,7 +107,7 @@ function Index() {
               ))}
               {pedidos.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center text-muted">Nenhum pedido pendente</td>
+                  <td colSpan="7" className="text-center text-muted">Nenhum pedido pendente</td>
                 </tr>
               )}
             </tbody>
